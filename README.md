@@ -32,3 +32,7 @@ Sebuah platform diskusi online berbasis web untuk mahasiswa lintas jurusan. Diba
 - Otentikasi kustom via `AdminAuthenticationBackend` dan `UserAuthenticationBackend`
 
 ---
+
+![Python](https://img.shields.io/badge/Python-3.11-blue?logo=python)
+![Django](https://img.shields.io/badge/Django-5.2-green?logo=django)
+
