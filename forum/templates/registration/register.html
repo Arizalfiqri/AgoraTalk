@@ -1,0 +1,886 @@
+{% load static %}
+
+{% block extra_css %}
+<style>
+    /* Reset dan isolasi untuk halaman register */
+    .register-page {
+        all: initial;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        box-sizing: border-box;
+    }
+    
+    .register-container {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        width: 100%;
+        max-width: 500px;
+        overflow: hidden;
+        position: relative;
+    }
+    
+    .register-header {
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        color: white;
+        padding: 32px 24px;
+        text-align: center;
+        position: relative;
+    }
+    
+    .register-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.1) 50%, transparent 70%);
+    }
+    
+    .register-header h1 {
+        margin: 0;
+        font-size: 24px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
+    
+    .register-header p {
+        margin: 8px 0 0 0;
+        opacity: 0.9;
+        font-size: 14px;
+    }
+    
+    .register-form {
+        padding: 32px 24px;
+    }
+    
+    .form-row {
+        display: flex;
+        gap: 16px;
+        margin-bottom: 20px;
+    }
+    
+    .form-group {
+        flex: 1;
+        margin-bottom: 20px;
+    }
+    
+    .form-group.full-width {
+        flex: none;
+        width: 100%;
+    }
+    
+    .form-label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 500;
+        color: #374151;
+        font-size: 14px;
+    }
+    
+    .form-label.required::after {
+        content: " *";
+        color: #ef4444;
+    }
+    
+    .form-input {
+        width: 100%;
+        padding: 12px 16px;
+        border: 2px solid #e5e7eb;
+        border-radius: 8px;
+        font-size: 16px;
+        transition: all 0.2s ease;
+        background: #fafafa;
+        box-sizing: border-box;
+    }
+    
+    .form-input:focus {
+        outline: none;
+        border-color: #28a745;
+        background: white;
+        box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.1);
+    }
+    
+    .form-input::placeholder {
+        color: #9ca3af;
+    }
+    
+    .form-help {
+        font-size: 12px;
+        color: #6b7280;
+        margin-top: 4px;
+    }
+    
+    .password-requirements {
+        background: #f8f9fa;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        padding: 16px;
+        margin-bottom: 20px;
+    }
+    
+    .password-requirements h6 {
+        margin: 0 0 8px 0;
+        font-size: 14px;
+        font-weight: 600;
+        color: #28a745;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .password-requirements ul {
+        margin: 0;
+        padding-left: 16px;
+        list-style: none;
+    }
+    
+    .password-requirements li {
+        font-size: 12px;
+        color: #6b7280;
+        margin-bottom: 4px;
+        position: relative;
+    }
+    
+    .password-requirements li::before {
+        content: "•";
+        color: #28a745;
+        position: absolute;
+        left: -12px;
+    }
+    
+    .verification-group {
+        background: #f0f9ff;
+        border: 1px solid #bae6fd;
+        border-radius: 8px;
+        padding: 16px;
+        margin-bottom: 20px;
+    }
+    
+    .verification-group h6 {
+        margin: 0 0 12px 0;
+        font-size: 14px;
+        font-weight: 600;
+        color: #0369a1;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .verification-flex {
+        display: flex;
+        gap: 12px;
+        align-items: end;
+    }
+    
+    .verification-flex .form-group {
+        flex: 1;
+        margin-bottom: 0;
+    }
+    
+    .send-code-btn {
+        padding: 12px 16px;
+        background: #0369a1;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        white-space: nowrap;
+        min-width: 120px;
+    }
+    
+    .send-code-btn:hover {
+        background: #0284c7;
+    }
+    
+    .send-code-btn:disabled {
+        background: #9ca3af;
+        cursor: not-allowed;
+    }
+    
+    .register-btn {
+        width: 100%;
+        padding: 14px;
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        margin-bottom: 16px;
+    }
+    
+    .register-btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(40, 167, 69, 0.4);
+    }
+    
+    .register-btn:active {
+        transform: translateY(0);
+    }
+    
+    .register-btn:disabled {
+        background: #9ca3af;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+    }
+    
+    .divider {
+        display: flex;
+        align-items: center;
+        margin: 24px 0;
+        color: #9ca3af;
+        font-size: 14px;
+    }
+    
+    .divider::before,
+    .divider::after {
+        content: '';
+        flex: 1;
+        height: 1px;
+        background: #e5e7eb;
+    }
+    
+    .divider span {
+        padding: 0 16px;
+    }
+    
+    .login-btn {
+        width: 100%;
+        padding: 14px;
+        background: transparent;
+        color: #667eea;
+        border: 2px solid #667eea;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        text-decoration: none;
+        display: inline-block;
+        text-align: center;
+        box-sizing: border-box;
+    }
+    
+    .login-btn:hover {
+        background: #667eea;
+        color: white;
+        transform: translateY(-1px);
+    }
+    
+    .terms {
+        text-align: center;
+        margin-top: 20px;
+        font-size: 12px;
+        color: #6b7280;
+    }
+    
+    .terms a {
+        color: #28a745;
+        text-decoration: none;
+    }
+    
+    .terms a:hover {
+        text-decoration: underline;
+    }
+    
+    /* Error notification */
+    .error-notification {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: #fee2e2;
+        border: 1px solid #fecaca;
+        border-left: 4px solid #ef4444;
+        color: #991b1b;
+        padding: 16px 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        z-index: 1000;
+        max-width: 400px;
+        animation: slideIn 0.3s ease-out;
+    }
+    
+    .error-notification .error-title {
+        font-weight: 600;
+        margin-bottom: 4px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .error-notification .error-message {
+        font-size: 14px;
+        margin: 0;
+    }
+    
+    .error-notification .close-btn {
+        position: absolute;
+        top: 8px;
+        right: 12px;
+        background: none;
+        border: none;
+        font-size: 18px;
+        cursor: pointer;
+        color: #991b1b;
+        padding: 0;
+        width: 24px;
+        height: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    /* Success notification */
+    .success-notification {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: #dcfce7;
+        border: 1px solid #bbf7d0;
+        border-left: 4px solid #22c55e;
+        color: #15803d;
+        padding: 16px 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        z-index: 1000;
+        max-width: 400px;
+        animation: slideIn 0.3s ease-out;
+    }
+    
+    .success-notification .success-title {
+        font-weight: 600;
+        margin-bottom: 4px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .success-notification .success-message {
+        font-size: 14px;
+        margin: 0;
+    }
+    
+    .success-notification .close-btn {
+        position: absolute;
+        top: 8px;
+        right: 12px;
+        background: none;
+        border: none;
+        font-size: 18px;
+        cursor: pointer;
+        color: #15803d;
+        padding: 0;
+        width: 24px;
+        height: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    @keyframes slideIn {
+        from {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+    
+    @keyframes slideOut {
+        from {
+            transform: translateX(0);
+            opacity: 1;
+        }
+        to {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+    }
+    
+    .error-notification.slide-out,
+    .success-notification.slide-out {
+        animation: slideOut 0.3s ease-in forwards;
+    }
+    
+    /* Icon styles */
+    .icon {
+        display: inline-block;
+        width: 16px;
+        height: 16px;
+        fill: currentColor;
+    }
+    
+    /* Responsive */
+    @media (max-width: 600px) {
+        .register-page {
+            padding: 12px;
+        }
+        
+        .register-form {
+            padding: 24px 20px;
+        }
+        
+        .register-header {
+            padding: 24px 20px;
+        }
+        
+        .form-row {
+            flex-direction: column;
+            gap: 0;
+        }
+        
+        .verification-flex {
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .verification-flex .form-group {
+            margin-bottom: 12px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="register-page">
+    <div class="register-container">
+        <div class="register-header">
+            <h1>
+                <svg class="icon" viewBox="0 0 24 24">
+                    <path d="M12 2C13.1 2 14 2.9 14 4C14 5.1 13.1 6 12 6C10.9 6 10 5.1 10 4C10 2.9 10.9 2 12 2ZM21 9V7L15 1L9 7V9C9 10.1 9.9 11 11 11V16L7.5 15.5C7.1 15.4 6.7 15.7 6.7 16.1L6.5 17.5C6.5 17.9 6.8 18.2 7.2 18.3L12 19L16.8 18.3C17.2 18.2 17.5 17.9 17.5 17.5L17.3 16.1C17.3 15.7 16.9 15.4 16.5 15.5L13 16V11C14.1 11 15 10.1 15 9V7L21 9Z"/>
+                </svg>
+                Bergabung Sekarang
+            </h1>
+            <p>Daftar akun baru di AgoraTalk</p>
+        </div>
+        
+        <div class="register-form">
+            <form method="post" id="registerForm">
+                {% csrf_token %}
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label required" for="username">Username</label>
+                        <input 
+                            type="text" 
+                            class="form-input" 
+                            id="username"
+                            name="username"
+                            placeholder="Username unik"
+                            required
+                            autocomplete="username"
+                        >
+                        <div class="form-help">Username harus unik dan mudah diingat</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label required" for="email">Email</label>
+                        <input 
+                            type="email" 
+                            class="form-input" 
+                            id="email"
+                            name="email"
+                            placeholder="email@example.com"
+                            required
+                            autocomplete="email"
+                        >
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label" for="jurusan">Jurusan</label>
+                        <input 
+                            type="text" 
+                            class="form-input" 
+                            id="jurusan"
+                            name="jurusan"
+                            placeholder="Teknik Informatika"
+                        >
+                        <div class="form-help">Opsional</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="angkatan">Angkatan</label>
+                        <input 
+                            type="text" 
+                            class="form-input" 
+                            id="angkatan"
+                            name="angkatan"
+                            placeholder="2024"
+                        >
+                        <div class="form-help">Opsional</div>
+                    </div>
+                </div>
+                
+                <!-- Email Verification -->
+                <div class="verification-group">
+                    <h6>
+                        <svg class="icon" viewBox="0 0 24 24">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                        </svg>
+                        Verifikasi Email
+                    </h6>
+                    <div class="verification-flex">
+                        <div class="form-group">
+                            <label class="form-label required" for="verification_code">Kode Verifikasi</label>
+                            <input 
+                                type="text" 
+                                class="form-input" 
+                                id="verification_code"
+                                name="verification_code"
+                                placeholder="Masukkan kode verifikasi"
+                                required
+                            >
+                        </div>
+                        <button type="button" class="send-code-btn" id="sendCodeBtn">
+                            Kirim Kode
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="password-requirements">
+                    <h6>
+                        <svg class="icon" viewBox="0 0 24 24">
+                            <path d="M12,17A2,2 0 0,0 14,15C14,13.89 13.1,13 12,13A2,2 0 0,0 10,15A2,2 0 0,0 12,17M18,8A2,2 0 0,1 20,10V20A2,2 0 0,1 18,22H6A2,2 0 0,1 4,20V10C4,8.89 4.9,8 6,8H7V6A5,5 0 0,1 12,1A5,5 0 0,1 17,6V8H18M12,3A3,3 0 0,0 9,6V8H15V6A3,3 0 0,0 12,3Z"/>
+                        </svg>
+                        Syarat Password
+                    </h6>
+                    <ul>
+                        <li>Minimal 8 karakter</li>
+                        <li>Tidak boleh sama dengan username</li>
+                        <li>Tidak boleh password yang terlalu umum</li>
+                        <li>Tidak boleh berupa angka semua</li>
+                    </ul>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label required" for="password1">Password</label>
+                    <input 
+                        type="password" 
+                        class="form-input" 
+                        id="password1"
+                        name="password1"
+                        placeholder="Password yang kuat"
+                        required
+                        autocomplete="new-password"
+                    >
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label required" for="password2">Konfirmasi Password</label>
+                    <input 
+                        type="password" 
+                        class="form-input" 
+                        id="password2"
+                        name="password2"
+                        placeholder="Ketik ulang password"
+                        required
+                        autocomplete="new-password"
+                    >
+                </div>
+                
+                <button type="submit" class="register-btn" id="registerBtn">
+                    Daftar Sekarang
+                </button>
+            </form>
+            
+            <div class="divider">
+                <span>sudah punya akun?</span>
+            </div>
+            
+            <a href="{% url 'login' %}" class="login-btn">
+                Masuk ke Akun
+            </a>
+            
+            <div class="terms">
+                Dengan mendaftar, Anda menyetujui 
+                <a href="#">Syarat & Ketentuan</a> dan 
+                <a href="#">Kebijakan Privasi</a> kami
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Error/Success notifications akan muncul di sini -->
+{% if form.errors %}
+<div class="error-notification" id="errorNotification">
+    <button class="close-btn" onclick="closeNotification('errorNotification')">&times;</button>
+    <div class="error-title">
+        <svg class="icon" viewBox="0 0 24 24">
+            <path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/>
+        </svg>
+        Pendaftaran Gagal
+    </div>
+    <div class="error-message">
+        {% for field, errors in form.errors.items %}
+            {% for error in errors %}
+                {{ error }}{% if not forloop.last %}<br>{% endif %}
+            {% endfor %}
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+<script>
+let verificationCodeSent = false;
+let cooldownTimer = null;
+
+// Get CSRF token
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+const csrftoken = getCookie('csrftoken');
+
+// Send verification code
+document.getElementById('sendCodeBtn').addEventListener('click', function() {
+    const email = document.getElementById('email').value;
+    const btn = this;
+    
+    if (!email) {
+        showNotification('error', 'Mohon masukkan email terlebih dahulu');
+        return;
+    }
+    
+    if (!isValidEmail(email)) {
+        showNotification('error', 'Format email tidak valid');
+        return;
+    }
+    
+    // Disable button and show loading
+    btn.disabled = true;
+    btn.textContent = 'Mengirim...';
+    
+    // Send AJAX request
+    fetch('/ajax/send-verification-code/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'X-CSRFToken': csrftoken,
+            'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: `email=${encodeURIComponent(email)}`
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showNotification('success', data.message);
+            verificationCodeSent = true;
+            startCooldown(btn, 60);
+        } else {
+            showNotification('error', data.error);
+            btn.disabled = false;
+            btn.textContent = 'Kirim Kode';
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showNotification('error', 'Terjadi kesalahan. Silakan coba lagi.');
+        btn.disabled = false;
+        btn.textContent = 'Kirim Kode';
+    });
+});
+
+// Real-time verification code validation
+document.getElementById('verification_code').addEventListener('input', function() {
+    const code = this.value;
+    const email = document.getElementById('email').value;
+    
+    if (code.length === 6 && email) {
+        validateVerificationCode(email, code);
+    }
+});
+
+function validateVerificationCode(email, code) {
+    fetch('/ajax/validate-verification-code/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'X-CSRFToken': csrftoken,
+            'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: `email=${encodeURIComponent(email)}&code=${encodeURIComponent(code)}`
+    })
+    .then(response => response.json())
+    .then(data => {
+        const input = document.getElementById('verification_code');
+        if (data.success) {
+            input.style.borderColor = '#22c55e';
+            input.style.backgroundColor = '#f0fdf4';
+        } else {
+            input.style.borderColor = '#ef4444';
+            input.style.backgroundColor = '#fef2f2';
+        }
+    })
+    .catch(error => {
+        console.error('Error validating code:', error);
+    });
+}
+
+// Start cooldown timer
+function startCooldown(btn, seconds) {
+    let timeLeft = seconds;
+    cooldownTimer = setInterval(() => {
+        btn.textContent = `Kirim Ulang (${timeLeft}s)`;
+        timeLeft--;
+        
+        if (timeLeft < 0) {
+            clearInterval(cooldownTimer);
+            btn.disabled = false;
+            btn.textContent = 'Kirim Ulang';
+        }
+    }, 1000);
+}
+
+// Form validation
+document.getElementById('registerForm').addEventListener('submit', function(e) {
+    const username = document.getElementById('username').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const password1 = document.getElementById('password1').value;
+    const password2 = document.getElementById('password2').value;
+    const verificationCode = document.getElementById('verification_code').value.trim();
+    
+    // Basic validation
+    if (!username || !email || !password1 || !password2) {
+        e.preventDefault();
+        showNotification('error', 'Mohon lengkapi semua field yang wajib diisi');
+        return;
+    }
+    
+    if (!isValidEmail(email)) {
+        e.preventDefault();
+        showNotification('error', 'Format email tidak valid');
+        return;
+    }
+    
+    if (password1 !== password2) {
+        e.preventDefault();
+        showNotification('error', 'Password dan konfirmasi password tidak cocok');
+        return;
+    }
+    
+    if (password1.length < 8) {
+        e.preventDefault();
+        showNotification('error', 'Password minimal 8 karakter');
+        return;
+    }
+    
+    if (!verificationCode) {
+        e.preventDefault();
+        showNotification('error', 'Mohon masukkan kode verifikasi');
+        return;
+    }
+    
+    if (verificationCode.length !== 6) {
+        e.preventDefault();
+        showNotification('error', 'Kode verifikasi harus 6 digit');
+        return;
+    }
+    
+    if (!verificationCodeSent) {
+        e.preventDefault();
+        showNotification('error', 'Mohon kirim kode verifikasi terlebih dahulu');
+        return;
+    }
+    
+    // Disable submit button
+    const registerBtn = document.getElementById('registerBtn');
+    registerBtn.disabled = true;
+    registerBtn.textContent = 'Mendaftar...';
+    
+    // Form will be submitted normally to Django
+});
+
+// Email validation
+function isValidEmail(email) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+}
+
+// Notification functions
+function showNotification(type, message) {
+    // Remove existing notifications
+    const existingNotifications = document.querySelectorAll('.error-notification, .success-notification');
+    existingNotifications.forEach(notif => notif.remove());
+    
+    // Create new notification
+    const notification = document.createElement('div');
+    notification.className = `${type}-notification`;
+    notification.id = `${type}Notification`;
+    
+    const iconPath = type === 'error' ? 
+        'M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z' :
+        'M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z';
+    
+    const title = type === 'error' ? 'Perhatian' : 'Berhasil';
+    
+    notification.innerHTML = `
+        <button class="close-btn" onclick="closeNotification('${type}Notification')">&times;</button>
+        <div class="${type}-title">
+            <svg class="icon" viewBox="0 0 24 24">
+                <path d="${iconPath}"/>
+            </svg>
+            ${title}
+        </div>
+        <div class="${type}-message">${message}</div>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    // Auto close after 5 seconds
+    setTimeout(() => {
+        closeNotification(`${type}Notification`);
+    }, 5000);
+}
+
+// Close notification
+function closeNotification(notificationId) {
+    const notification = document.getElementById(notificationId);
+    if (notification) {
+        notification.classList.add('slide-out');
+        setTimeout(() => {
+            notification.remove();
+        }, 300);
+    }
+}
+
+// Auto close existing notifications on page load
+document.addEventListener('DOMContentLoaded', function() {
+    const existingNotifications = document.querySelectorAll('.error-notification, .success-notification');
+    existingNotifications.forEach(notif => {
+        setTimeout(() => {
+            closeNotification(notif.id);
+        }, 5000);
+    });
+});
+</script>
+{% endblock %}

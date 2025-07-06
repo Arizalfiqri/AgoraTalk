@@ -1,0 +1,325 @@
+{% extends 'forum/base.html' %}
+{% load static %}
+
+{% block title %}
+    {% if query %}
+        Hasil Pencarian: "{{ query }}"
+    {% else %}
+        Pencarian
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar Filter -->
+        <div class="col-lg-3 col-md-4 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h6 class="mb-0"><i class="fas fa-filter me-2"></i>Filter Pencarian</h6>
+                </div>
+                <div class="card-body">
+                    <form method="GET" action="{% url 'search' %}" id="searchFilterForm">
+                        <!-- Search Input -->
+                        <div class="mb-3">
+                            <label for="searchQuery" class="form-label">Kata Kunci</label>
+                            <input type="text" class="form-control" id="searchQuery" name="q" 
+                                   value="{{ query }}" placeholder="Cari thread, konten, atau tag...">
+                        </div>
+                        
+                        <!-- Category Filter -->
+                        <div class="mb-3">
+                            <label for="categoryFilter" class="form-label">Kategori</label>
+                            <select class="form-select" id="categoryFilter" name="category">
+                                <option value="">Semua Kategori</option>
+                                {% for category in categories %}
+                                    <option value="{{ category.name }}" 
+                                            {% if category_filter == category.name %}selected{% endif %}>
+                                        {{ category.name }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <!-- Sort Options -->
+                        <div class="mb-3">
+                            <label for="sortOption" class="form-label">Urutkan</label>
+                            <select class="form-select" id="sortOption" name="sort">
+                                <option value="recent" {% if sort == 'recent' %}selected{% endif %}>Terbaru</option>
+                                <option value="popular" {% if sort == 'popular' %}selected{% endif %}>Populer</option>
+                                <option value="most_commented" {% if sort == 'most_commented' %}selected{% endif %}>Paling Banyak Komentar</option>
+                            </select>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="fas fa-search me-2"></i>Cari
+                        </button>
+                        
+                        {% if query or category_filter %}
+                            <a href="{% url 'search' %}" class="btn btn-outline-secondary w-100 mt-2">
+                                <i class="fas fa-times me-2"></i>Reset Filter
+                            </a>
+                        {% endif %}
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Search Results -->
+        <div class="col-lg-9 col-md-8">
+            <!-- Search Header -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    {% if query %}
+                        <h4 class="mb-1">Hasil Pencarian untuk: <span class="text-primary">"{{ query }}"</span></h4>
+                        <p class="text-muted mb-0">
+                            Ditemukan {{ threads.paginator.count }} thread
+                            {% if category_filter %}dalam kategori <strong>{{ category_filter }}</strong>{% endif %}
+                        </p>
+                    {% else %}
+                        <h4 class="mb-1">Pencarian Thread</h4>
+                        <p class="text-muted mb-0">Gunakan form pencarian untuk mencari thread</p>
+                    {% endif %}
+                </div>
+                
+                <!-- Quick Sort -->
+                {% if query %}
+                    <div class="dropdown">
+                        <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-sort me-2"></i>
+                            {% if sort == 'popular' %}Populer
+                            {% elif sort == 'most_commented' %}Paling Banyak Komentar
+                            {% else %}Terbaru{% endif %}
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="?q={{ query }}&category={{ category_filter }}&sort=recent">Terbaru</a></li>
+                            <li><a class="dropdown-item" href="?q={{ query }}&category={{ category_filter }}&sort=popular">Populer</a></li>
+                            <li><a class="dropdown-item" href="?q={{ query }}&category={{ category_filter }}&sort=most_commented">Paling Banyak Komentar</a></li>
+                        </ul>
+                    </div>
+                {% endif %}
+            </div>
+            
+            <!-- Search Results -->
+            {% if threads %}
+                <div class="row">
+                    {% for thread in threads %}
+                        <div class="col-12 mb-3">
+                            <div class="card h-100 shadow-sm hover-shadow">
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-8">
+                                            <!-- Thread Title -->
+                                            <h5 class="card-title mb-2">
+                                                <a href="{% url 'thread_detail' thread.pk %}" class="text-decoration-none">
+                                                    {% if thread.is_pinned %}
+                                                        <i class="fas fa-thumbtack text-warning me-1"></i>
+                                                    {% endif %}
+                                                    {{ thread.title }}
+                                                </a>
+                                            </h5>
+                                            
+                                            <!-- Thread Preview -->
+                                            <p class="card-text text-muted mb-2">
+                                                {{ thread.content|truncatewords:20 }}
+                                            </p>
+                                            
+                                            <!-- Thread Meta -->
+                                            <div class="d-flex flex-wrap align-items-center gap-3 text-muted small">
+                                                <span>
+                                                    <i class="fas fa-user me-1"></i>
+                                                    <a href="#" class="text-decoration-none">{{ thread.author.username }}</a>
+                                                </span>
+                                                <span>
+                                                    <i class="fas fa-folder me-1"></i>
+                                                    <a href="{% url 'thread_list_category' thread.category.name|lower|slugify %}" 
+                                                       class="text-decoration-none">{{ thread.category.name }}</a>
+                                                </span>
+                                                <span>
+                                                    <i class="fas fa-clock me-1"></i>
+                                                    {{ thread.created_at|timesince }} yang lalu
+                                                </span>
+                                            </div>
+                                            
+                                            <!-- Tags -->
+                                            {% if thread.tags %}
+                                                <div class="mt-2">
+                                                    {% for tag in thread.tags|slice:":3" %}
+                                                        {% if tag.strip %}
+                                                            <span class="badge bg-light text-dark me-1">
+                                                                <i class="fas fa-tag me-1"></i>{{ tag.strip }}
+                                                            </span>
+                                                        {% endif %}
+                                                    {% endfor %}
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                        
+                                        <div class="col-md-4">
+                                            <!-- Thread Stats -->
+                                            <div class="d-flex justify-content-end align-items-center h-100">
+                                                <div class="text-center">
+                                                    <div class="row g-3">
+                                                        <div class="col-4">
+                                                            <div class="bg-light rounded p-2">
+                                                                <div class="fw-bold text-primary">{{ thread.views }}</div>
+                                                                <small class="text-muted">Views</small>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-4">
+                                                            <div class="bg-light rounded p-2">
+                                                                <div class="fw-bold text-success">{{ thread.comment_count|default:0 }}</div>
+                                                                <small class="text-muted">Komentar</small>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-4">
+                                                            <div class="bg-light rounded p-2">
+                                                                <div class="fw-bold text-info">{{ thread.get_vote_score|default:0 }}</div>
+                                                                <small class="text-muted">Score</small>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+                
+                <!-- Pagination -->
+                {% if threads.has_other_pages %}
+                    <nav aria-label="Search pagination">
+                        <ul class="pagination justify-content-center">
+                            {% if threads.has_previous %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?q={{ query }}&category={{ category_filter }}&sort={{ sort }}&page={{ threads.previous_page_number }}">
+                                        <i class="fas fa-chevron-left"></i>
+                                    </a>
+                                </li>
+                            {% endif %}
+                            
+                            {% for num in threads.paginator.page_range %}
+                                {% if threads.number == num %}
+                                    <li class="page-item active">
+                                        <span class="page-link">{{ num }}</span>
+                                    </li>
+                                {% elif num > threads.number|add:'-3' and num < threads.number|add:'3' %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?q={{ query }}&category={{ category_filter }}&sort={{ sort }}&page={{ num }}">{{ num }}</a>
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+                            
+                            {% if threads.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?q={{ query }}&category={{ category_filter }}&sort={{ sort }}&page={{ threads.next_page_number }}">
+                                        <i class="fas fa-chevron-right"></i>
+                                    </a>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                {% endif %}
+                
+            {% elif query %}
+                <!-- No Results -->
+                <div class="text-center py-5">
+                    <div class="mb-4">
+                        <i class="fas fa-search-minus text-muted" style="font-size: 4rem;"></i>
+                    </div>
+                    <h4 class="text-muted mb-3">Tidak ada hasil ditemukan</h4>
+                    <p class="text-muted mb-4">
+                        Pencarian untuk <strong>"{{ query }}"</strong> tidak menghasilkan thread apapun.
+                        {% if category_filter %}
+                            <br>Coba hapus filter kategori atau ubah kata kunci pencarian.
+                        {% endif %}
+                    </p>
+                    <div class="d-flex justify-content-center gap-2">
+                        <a href="{% url 'search' %}" class="btn btn-outline-primary">
+                            <i class="fas fa-search me-2"></i>Cari Lagi
+                        </a>
+                        <a href="{% url 'thread_list' %}" class="btn btn-primary">
+                            <i class="fas fa-list me-2"></i>Lihat Semua Thread
+                        </a>
+                    </div>
+                </div>
+            {% else %}
+                <!-- Search Welcome -->
+                <div class="text-center py-5">
+                    <div class="mb-4">
+                        <i class="fas fa-search text-primary" style="font-size: 4rem;"></i>
+                    </div>
+                    <h4 class="mb-3">Cari Thread</h4>
+                    <p class="text-muted mb-4">
+                        Gunakan form pencarian di sebelah kiri untuk mencari thread berdasarkan judul, konten, author, atau tag.
+                    </p>
+                    <div class="row justify-content-center">
+                        <div class="col-md-6">
+                            <div class="card bg-light">
+                                <div class="card-body">
+                                    <h6 class="card-title">Tips Pencarian:</h6>
+                                    <ul class="list-unstyled mb-0 text-start">
+                                        <li><i class="fas fa-check text-success me-2"></i>Gunakan kata kunci yang spesifik</li>
+                                        <li><i class="fas fa-check text-success me-2"></i>Coba berbagai kombinasi kata</li>
+                                        <li><i class="fas fa-check text-success me-2"></i>Gunakan filter kategori untuk hasil yang lebih tepat</li>
+                                        <li><i class="fas fa-check text-success me-2"></i>Cari berdasarkan nama pengguna atau tag</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+.hover-shadow:hover {
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+    transform: translateY(-2px);
+    transition: all 0.3s ease;
+}
+
+.card {
+    transition: all 0.3s ease;
+}
+
+.badge {
+    font-size: 0.75rem;
+}
+
+.bg-light {
+    background-color: #f8f9fa !important;
+}
+
+.text-primary {
+    color: #0d6efd !important;
+}
+
+.text-success {
+    color: #198754 !important;
+}
+
+.text-info {
+    color: #0dcaf0 !important;
+}
+
+@media (max-width: 768px) {
+    .card-body .row {
+        flex-direction: column;
+    }
+    
+    .card-body .col-md-4 {
+        margin-top: 1rem;
+    }
+    
+    .d-flex.justify-content-end {
+        justify-content: center !important;
+    }
+}
+</style>
+{% endblock %}

@@ -1,0 +1,327 @@
+{% extends 'forum/base.html' %}
+{% load static %}
+
+{% block title %}Buat Thread Baru - AgoraTalk{% endblock %}
+
+{% block extra_css %}
+<style>
+    .create-thread-card {
+        border: none;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        border-radius: 10px;
+    }
+    
+    .form-label {
+        font-weight: 600;
+        color: #495057;
+        margin-bottom: 8px;
+    }
+    
+    .form-control, .form-select {
+        border: 2px solid #e9ecef;
+        border-radius: 8px;
+        padding: 12px 16px;
+        transition: all 0.3s ease;
+    }
+    
+    .form-control:focus, .form-select:focus {
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.15);
+    }
+    
+    .btn-primary {
+        background: linear-gradient(135deg, #0d6efd 0%, #0056b3 100%);
+        border: none;
+        border-radius: 8px;
+        padding: 12px 30px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(13, 110, 253, 0.3);
+    }
+    
+    .btn-outline-secondary {
+        border: 2px solid #6c757d;
+        border-radius: 8px;
+        padding: 12px 30px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+    
+    .help-text {
+        font-size: 0.875rem;
+        color: #6c757d;
+        margin-top: 5px;
+    }
+    
+    .page-header {
+        background: linear-gradient(135deg, #0d6efd 0%, #0056b3 100%);
+        color: white;
+        padding: 40px 0;
+        margin-bottom: 30px;
+        border-radius: 0 0 20px 20px;
+    }
+    
+    .required-field::after {
+        content: " *";
+        color: #dc3545;
+    }
+    
+    .category-info {
+        background-color: #f8f9fa;
+        border-left: 4px solid #0d6efd;
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+    }
+    
+    @media (max-width: 768px) {
+        .page-header {
+            padding: 20px 0;
+            margin-bottom: 20px;
+        }
+        
+        .btn-primary, .btn-outline-secondary {
+            width: 100%;
+            margin-bottom: 10px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<div class="page-header">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-12">
+                <h1 class="mb-0">
+                    <i class="fas fa-plus-circle me-3"></i>Buat Thread Baru
+                </h1>
+                <p class="mb-0 mt-2 opacity-75">Bagikan pertanyaan, diskusi, atau topik menarik dengan komunitas</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- Tips Card -->
+            <div class="category-info">
+                <h6 class="mb-2">
+                    <i class="fas fa-lightbulb text-warning me-2"></i>Tips Membuat Thread yang Baik
+                </h6>
+                <ul class="mb-0 small">
+                    <li>Gunakan judul yang jelas dan deskriptif</li>
+                    <li>Pilih kategori yang sesuai dengan topik</li>
+                    <li>Gunakan tags untuk memudahkan pencarian</li>
+                    <li>Jelaskan masalah atau topik dengan detail yang cukup</li>
+                </ul>
+            </div>
+
+            <!-- Form Card -->
+            <div class="card create-thread-card">
+                <div class="card-header bg-white border-0 py-4">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-edit text-primary me-2"></i>Form Thread Baru
+                    </h5>
+                </div>
+                
+                <div class="card-body p-4">
+                    <form method="post" id="createThreadForm">
+                        {% csrf_token %}
+                        
+                        <!-- Judul Thread -->
+                        <div class="mb-4">
+                            <label for="{{ form.title.id_for_label }}" class="form-label required-field">
+                                <i class="fas fa-heading me-2"></i>Judul Thread
+                            </label>
+                            {{ form.title }}
+                            <div class="help-text">
+                                <i class="fas fa-info-circle me-1"></i>
+                                Buat judul yang menarik dan menggambarkan isi thread dengan jelas
+                            </div>
+                            {% if form.title.errors %}
+                                <div class="text-danger small mt-1">
+                                    {% for error in form.title.errors %}
+                                        <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Kategori -->
+                        <div class="mb-4">
+                            <label for="{{ form.category.id_for_label }}" class="form-label required-field">
+                                <i class="fas fa-folder me-2"></i>Kategori
+                            </label>
+                            {{ form.category }}
+                            <div class="help-text">
+                                <i class="fas fa-info-circle me-1"></i>
+                                Pilih kategori yang paling sesuai dengan topik thread Anda
+                            </div>
+                            {% if form.category.errors %}
+                                <div class="text-danger small mt-1">
+                                    {% for error in form.category.errors %}
+                                        <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Tags -->
+                        <div class="mb-4">
+                            <label for="{{ form.tags.id_for_label }}" class="form-label">
+                                <i class="fas fa-tags me-2"></i>Tags
+                            </label>
+                            {{ form.tags }}
+                            <div class="help-text">
+                                <i class="fas fa-info-circle me-1"></i>
+                                Pisahkan setiap tag dengan koma. Contoh: python, django, web development
+                            </div>
+                            {% if form.tags.errors %}
+                                <div class="text-danger small mt-1">
+                                    {% for error in form.tags.errors %}
+                                        <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Konten Thread -->
+                        <div class="mb-4">
+                            <label for="{{ form.content.id_for_label }}" class="form-label required-field">
+                                <i class="fas fa-align-left me-2"></i>Isi Thread
+                            </label>
+                            {{ form.content }}
+                            <div class="help-text">
+                                <i class="fas fa-info-circle me-1"></i>
+                                Jelaskan topik, pertanyaan, atau masalah Anda dengan detail yang cukup
+                            </div>
+                            {% if form.content.errors %}
+                                <div class="text-danger small mt-1">
+                                    {% for error in form.content.errors %}
+                                        <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="d-flex justify-content-between align-items-center pt-3 border-top">
+                            <div class="text-muted small">
+                                <i class="fas fa-gift me-1"></i>
+                                Anda akan mendapat <strong>10 poin</strong> setelah thread dipublikasi
+                            </div>
+                            <div class="btn-group">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-paper-plane me-2"></i>Publikasikan Thread
+                                </button>
+                                <a href="{% url 'thread_list' %}" class="btn btn-outline-secondary">
+                                    <i class="fas fa-times me-2"></i>Batal
+                                </a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Guidelines Card -->
+            <div class="card mt-4 border-0">
+                <div class="card-body bg-light">
+                    <h6 class="card-title">
+                        <i class="fas fa-shield-alt text-success me-2"></i>Pedoman Komunitas
+                    </h6>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <ul class="list-unstyled small mb-0">
+                                <li class="mb-1"><i class="fas fa-check text-success me-2"></i>Gunakan bahasa yang sopan dan santun</li>
+                                <li class="mb-1"><i class="fas fa-check text-success me-2"></i>Hindari spam dan konten duplikat</li>
+                                <li class="mb-1"><i class="fas fa-check text-success me-2"></i>Berikan informasi yang akurat</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <ul class="list-unstyled small mb-0">
+                                <li class="mb-1"><i class="fas fa-times text-danger me-2"></i>Jangan posting konten yang melanggar hukum</li>
+                                <li class="mb-1"><i class="fas fa-times text-danger me-2"></i>Hindari konten yang menyinggung SARA</li>
+                                <li class="mb-1"><i class="fas fa-times text-danger me-2"></i>Jangan berbagi informasi pribadi</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Auto-resize textarea
+    const textarea = document.querySelector('#id_content');
+    if (textarea) {
+        textarea.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = this.scrollHeight + 'px';
+        });
+    }
+    
+    // Form validation
+    const form = document.getElementById('createThreadForm');
+    form.addEventListener('submit', function(e) {
+        let isValid = true;
+        const requiredFields = ['id_title', 'id_category', 'id_content'];
+        
+        requiredFields.forEach(fieldId => {
+            const field = document.getElementById(fieldId);
+            if (field && !field.value.trim()) {
+                isValid = false;
+                field.classList.add('is-invalid');
+            } else if (field) {
+                field.classList.remove('is-invalid');
+            }
+        });
+        
+        if (!isValid) {
+            e.preventDefault();
+            // Show error toast or alert
+            const alertDiv = document.createElement('div');
+            alertDiv.className = 'alert alert-danger alert-dismissible fade show mt-3';
+            alertDiv.innerHTML = `
+                <i class="fas fa-exclamation-circle me-2"></i>
+                Mohon lengkapi semua field yang wajib diisi.
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            form.prepend(alertDiv);
+        }
+    });
+    
+    // Character counter for title
+    const titleField = document.getElementById('id_title');
+    if (titleField) {
+        const maxLength = 255;
+        const counter = document.createElement('div');
+        counter.className = 'small text-muted mt-1';
+        titleField.parentNode.appendChild(counter);
+        
+        function updateCounter() {
+            const remaining = maxLength - titleField.value.length;
+            counter.textContent = `${remaining} karakter tersisa`;
+            if (remaining < 20) {
+                counter.className = 'small text-warning mt-1';
+            } else {
+                counter.className = 'small text-muted mt-1';
+            }
+        }
+        
+        titleField.addEventListener('input', updateCounter);
+        updateCounter();
+    }
+});
+</script>
+{% endblock %}

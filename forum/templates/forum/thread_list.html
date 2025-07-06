@@ -1,0 +1,401 @@
+{% extends 'forum/base.html' %}
+{% load static %}
+{% load humanize %}
+{% load forum_extras %}
+
+{% block title %}
+    {% if category %}{{ category.name }} - {% endif %}Forum Diskusi - AgoraTalk
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .thread-card {
+        border: none;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        border-radius: 10px;
+        transition: all 0.3s ease;
+        margin-bottom: 20px;
+    }
+    
+    .thread-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.12);
+    }
+    
+    .thread-meta {
+        font-size: 0.875rem;
+        color: #6c757d;
+    }
+    
+    .thread-title {
+        color: #212529;
+        text-decoration: none;
+        font-weight: 600;
+        line-height: 1.4;
+    }
+    
+    .thread-title:hover {
+        color: #0d6efd;
+    }
+    
+    .thread-stats {
+        display: flex;
+        gap: 15px;
+        align-items: center;
+        font-size: 0.8rem;
+        color: #6c757d;
+    }
+    
+    .category-badge {
+        font-size: 0.75rem;
+        padding: 4px 8px;
+        border-radius: 6px;
+        text-decoration: none;
+    }
+    
+    .author-info {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .author-avatar {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+    }
+    
+    .page-header {
+        background: linear-gradient(135deg, #0d6efd 0%, #0056b3 100%);
+        color: white;
+        padding: 30px 0;
+        margin-bottom: 30px;
+        border-radius: 0 0 15px 15px;
+    }
+    
+    .filter-bar {
+        background: #f8f9fa;
+        padding: 20px;
+        border-radius: 10px;
+        margin-bottom: 25px;
+    }
+    
+    .sort-buttons .btn {
+        border-radius: 20px;
+        padding: 8px 16px;
+        font-size: 0.875rem;
+        border: 1px solid #dee2e6;
+        background: white;
+        color: #6c757d;
+        margin-right: 8px;
+        transition: all 0.2s ease;
+    }
+    
+    .sort-buttons .btn.active {
+        background: #0d6efd;
+        color: white;
+        border-color: #0d6efd;
+    }
+    
+    .thread-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+        margin-top: 8px;
+    }
+    
+    .tag {
+        background: #e9ecef;
+        color: #495057;
+        padding: 2px 8px;
+        border-radius: 12px;
+        font-size: 0.75rem;
+        text-decoration: none;
+    }
+    
+    .tag:hover {
+        background: #0d6efd;
+        color: white;
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        color: #6c757d;
+    }
+    
+    .pagination {
+        justify-content: center;
+        margin-top: 30px;
+    }
+    
+    .pagination .page-link {
+        border-radius: 8px;
+        margin: 0 3px;
+        border: 1px solid #dee2e6;
+        color: #6c757d;
+    }
+    
+    .pagination .page-item.active .page-link {
+        background: #0d6efd;
+        border-color: #0d6efd;
+    }
+    
+    @media (max-width: 768px) {
+        .page-header {
+            padding: 20px 0;
+            text-align: center;
+        }
+        
+        .filter-bar {
+            padding: 15px;
+        }
+        
+        .sort-buttons {
+            text-align: center;
+        }
+        
+        .sort-buttons .btn {
+            margin-bottom: 8px;
+            width: 100%;
+        }
+        
+        .thread-stats {
+            flex-direction: column;
+            gap: 8px;
+            align-items: flex-start;
+        }
+        
+        .author-info {
+            margin-top: 10px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<div class="page-header">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h1 class="mb-0">
+                    <i class="fas fa-comments me-3"></i>
+                    {% if category %}
+                        {{ category.name }}
+                    {% else %}
+                        Forum Diskusi
+                    {% endif %}
+                </h1>
+                <p class="mb-0 mt-2 opacity-75">
+                    {% if category %}
+                        {{ category.description|default:"Diskusi seputar topik ini" }}
+                    {% else %}
+                        Tempat berbagi pengetahuan dan diskusi mahasiswa
+                    {% endif %}
+                </p>
+            </div>
+            <div class="col-md-4 text-md-end">
+                <a href="{% url 'create_thread' %}" class="btn btn-light">
+                    <i class="fas fa-plus me-2"></i>Buat Thread Baru
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <!-- Filter & Sort Bar -->
+    <div class="filter-bar">
+        <div class="row align-items-center">
+            <div class="col-md-6">
+                <h6 class="mb-2">
+                    <i class="fas fa-filter me-2"></i>Filter & Urutkan
+                </h6>
+                <div class="sort-buttons">
+                    <a href="{% url_with_params request sort='recent' %}" 
+                       class="btn {% if sort == 'recent' or not sort %}active{% endif %}">
+                        <i class="fas fa-clock me-1"></i>Terbaru
+                    </a>
+                    <a href="{% url_with_params request sort='popular' %}" 
+                       class="btn {% if sort == 'popular' %}active{% endif %}">
+                        <i class="fas fa-fire me-1"></i>Populer
+                    </a>
+                    <a href="{% url_with_params request sort='most_commented' %}" 
+                       class="btn {% if sort == 'most_commented' %}active{% endif %}">
+                        <i class="fas fa-comments me-1"></i>Paling Dikomentari
+                    </a>
+                </div>
+            </div>
+            <div class="col-md-6 text-md-end">
+                <div class="thread-count">
+                    <small class="text-muted">
+                        <i class="fas fa-list me-1"></i>
+                        {{ threads.paginator.count }} thread ditemukan
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Thread List -->
+    {% if threads %}
+        <div class="thread-list">
+            {% for thread in threads %}
+                <div class="card thread-card">
+                    <div class="card-body p-4">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <!-- Thread Title -->
+                                <h5 class="mb-2">
+                                    {% if thread.is_pinned %}
+                                        <i class="fas fa-thumbtack text-warning me-2" title="Thread Disematkan"></i>
+                                    {% endif %}
+                                    {% if thread.is_locked %}
+                                        <i class="fas fa-lock text-muted me-2" title="Thread Dikunci"></i>
+                                    {% endif %}
+                                    <a href="{{ thread.get_absolute_url }}" class="thread-title">
+                                        {{ thread.title }}
+                                    </a>
+                                </h5>
+                                
+                                <!-- Thread Meta -->
+                                <div class="thread-meta mb-2">
+                                    <span class="me-3">
+                                        <i class="fas fa-user me-1"></i>
+                                        {{ thread.author.username }}
+                                    </span>
+                                    <span class="me-3">
+                                        <i class="fas fa-calendar me-1"></i>
+                                        {{ thread.created_at|naturaltime }}
+                                    </span>
+                                    {% if thread.category %}
+                                        <a href="{% url 'thread_list_category' thread.category.name|lower|slugify %}" 
+                                           class="category-badge text-decoration-none"
+                                           style="background-color: {{ thread.category.color }}20; color: {{ thread.category.color }};">
+                                            {% if thread.category.icon %}
+                                                <i class="{{ thread.category.icon }} me-1"></i>
+                                            {% endif %}
+                                            {{ thread.category.name }}
+                                        </a>
+                                    {% endif %}
+                                </div>
+                                
+                                <!-- Thread Preview -->
+                                <p class="text-muted mb-2">
+                                    {{ thread.content|truncatewords:20|striptags }}
+                                </p>
+                                
+                                <!-- Tags -->
+                                {% if thread.tags %}
+                                    <div class="thread-tags">
+                                        {% for tag in thread.tags|get_tags_list %}
+                                            <a href="{% url 'search' %}?q={{ tag }}" class="tag">
+                                                {{ tag }}
+                                            </a>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="col-md-4">
+                                <!-- Author Info -->
+                                <div class="author-info mb-3">
+                                    {% if thread.author.avatar %}
+                                        <img src="{{ thread.author.avatar.url }}" class="author-avatar" alt="Avatar">
+                                    {% else %}
+                                        <div class="author-avatar bg-secondary d-flex align-items-center justify-content-center">
+                                            <i class="fas fa-user text-white"></i>
+                                        </div>
+                                    {% endif %}
+                                    <div>
+                                        <div class="fw-semibold">{{ thread.author.username }}</div>
+                                        <small class="text-muted">{{ thread.author.points }} poin</small>
+                                    </div>
+                                </div>
+                                
+                                <!-- Thread Stats -->
+                                <div class="thread-stats">
+                                    <span>
+                                        <i class="fas fa-eye me-1"></i>
+                                        {{ thread.views }}
+                                    </span>
+                                    <span>
+                                        <i class="fas fa-comments me-1"></i>
+                                        {{ thread.comment_count }}
+                                    </span>
+                                    {% if thread.last_activity %}
+                                        <span>
+                                            <i class="fas fa-clock me-1"></i>
+                                            {{ thread.last_activity|naturaltime }}
+                                        </span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+        
+        <!-- Pagination -->
+        {% render_pagination threads request %}
+    {% else %}
+        <!-- Empty State -->
+        <div class="empty-state">
+            <i class="fas fa-comments fa-4x mb-3 text-muted"></i>
+            <h4>Belum Ada Thread</h4>
+            <p class="text-muted">
+                {% if category %}
+                    Belum ada diskusi di kategori {{ category.name }}.
+                {% else %}
+                    Belum ada diskusi yang tersedia.
+                {% endif %}
+            </p>
+            <a href="{% url 'create_thread' %}" class="btn btn-primary">
+                <i class="fas fa-plus me-2"></i>Buat Thread Pertama
+            </a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Add smooth scrolling for pagination
+    const paginationLinks = document.querySelectorAll('.pagination .page-link');
+    paginationLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            // Scroll to top of thread list
+            const threadList = document.querySelector('.thread-list');
+            if (threadList) {
+                threadList.scrollIntoView({ behavior: 'smooth' });
+            }
+        });
+    });
+    
+    // Auto-refresh thread list every 5 minutes for new content
+    setInterval(function() {
+        const currentUrl = window.location.href;
+        if (currentUrl.includes('forum') && !document.hidden) {
+            // Only refresh if user is actively viewing the page
+            fetch(currentUrl, {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => {
+                if (response.ok) {
+                    // Update thread count or show notification for new threads
+                    console.log('Thread list refreshed');
+                }
+            })
+            .catch(error => {
+                console.log('Auto-refresh failed:', error);
+            });
+        }
+    }, 300000); // 5 minutes
+});
+</script>
+{% endblock %}

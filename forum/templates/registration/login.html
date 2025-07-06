@@ -1,0 +1,441 @@
+{% load static %}
+
+
+{% block extra_css %}
+<style>
+    /* Reset dan isolasi untuk halaman login */
+    .login-page {
+        all: initial;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: white;
+        padding: 20px;
+        box-sizing: border-box;
+    }
+    
+    .login-container {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        width: 100%;
+        max-width: 400px;
+        overflow: hidden;
+        position: relative;
+    }
+    
+    .login-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 32px 24px;
+        text-align: center;
+        position: relative;
+    }
+    
+    .login-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.1) 50%, transparent 70%);
+    }
+    
+    .login-header h1 {
+        margin: 0;
+        font-size: 24px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
+    
+    .login-header p {
+        margin: 8px 0 0 0;
+        opacity: 0.9;
+        font-size: 14px;
+    }
+    
+    .login-form {
+        padding: 32px 24px;
+    }
+    
+    .form-group {
+        margin-bottom: 20px;
+    }
+    
+    .form-label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 500;
+        color: #374151;
+        font-size: 14px;
+    }
+    
+    .form-input {
+        width: 100%;
+        padding: 12px 16px;
+        border: 2px solid #e5e7eb;
+        border-radius: 8px;
+        font-size: 16px;
+        transition: all 0.2s ease;
+        background: #fafafa;
+        box-sizing: border-box;
+    }
+    
+    .form-input:focus {
+        outline: none;
+        border-color: #667eea;
+        background: white;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+    
+    .form-input::placeholder {
+        color: #9ca3af;
+    }
+    
+    .login-btn {
+        width: 100%;
+        padding: 14px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        margin-bottom: 16px;
+    }
+    
+    .login-btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    }
+    
+    .login-btn:active {
+        transform: translateY(0);
+    }
+    
+    .forgot-password {
+        text-align: center;
+        margin-bottom: 24px;
+    }
+    
+    .forgot-password a {
+        color: #667eea;
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 500;
+    }
+    
+    .forgot-password a:hover {
+        text-decoration: underline;
+    }
+    
+    .divider {
+        display: flex;
+        align-items: center;
+        margin: 24px 0;
+        color: #9ca3af;
+        font-size: 14px;
+    }
+    
+    .divider::before,
+    .divider::after {
+        content: '';
+        flex: 1;
+        height: 1px;
+        background: #e5e7eb;
+    }
+    
+    .divider span {
+        padding: 0 16px;
+    }
+    
+    .register-btn {
+        width: 100%;
+        padding: 14px;
+        background: transparent;
+        color: #667eea;
+        border: 2px solid #667eea;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        text-decoration: none;
+        display: inline-block;
+        text-align: center;
+        box-sizing: border-box;
+    }
+    
+    .register-btn:hover {
+        background: #667eea;
+        color: white;
+        transform: translateY(-1px);
+    }
+    
+    .terms {
+        text-align: center;
+        margin-top: 20px;
+        font-size: 12px;
+        color: #6b7280;
+    }
+    
+    .terms a {
+        color: #667eea;
+        text-decoration: none;
+    }
+    
+    .terms a:hover {
+        text-decoration: underline;
+    }
+    
+    /* Error notification */
+    .error-notification {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: #fee2e2;
+        border: 1px solid #fecaca;
+        border-left: 4px solid #ef4444;
+        color: #991b1b;
+        padding: 16px 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        z-index: 1000;
+        max-width: 400px;
+        animation: slideIn 0.3s ease-out;
+    }
+    
+    .error-notification .error-title {
+        font-weight: 600;
+        margin-bottom: 4px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .error-notification .error-message {
+        font-size: 14px;
+        margin: 0;
+    }
+    
+    .error-notification .close-btn {
+        position: absolute;
+        top: 8px;
+        right: 12px;
+        background: none;
+        border: none;
+        font-size: 18px;
+        cursor: pointer;
+        color: #991b1b;
+        padding: 0;
+        width: 24px;
+        height: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    @keyframes slideIn {
+        from {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+    
+    @keyframes slideOut {
+        from {
+            transform: translateX(0);
+            opacity: 1;
+        }
+        to {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+    }
+    
+    .error-notification.slide-out {
+        animation: slideOut 0.3s ease-in forwards;
+    }
+    
+    /* Icon styles */
+    .icon {
+        display: inline-block;
+        width: 16px;
+        height: 16px;
+        fill: currentColor;
+    }
+    
+    /* Responsive */
+    @media (max-width: 480px) {
+        .login-page {
+            padding: 12px;
+        }
+        
+        .login-form {
+            padding: 24px 20px;
+        }
+        
+        .login-header {
+            padding: 24px 20px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="login-page">
+    <div class="login-container">
+        <div class="login-header">
+            <h1>
+                <svg class="icon" viewBox="0 0 24 24">
+                    <path d="M12 3L1 9l4 2.18v6L12 21l7-3.82v-6l2-1.09V17h2V9L12 3zm6.82 6L12 12.72 5.18 9 12 5.28 18.82 9zM17 15.99l-5 2.73-5-2.73v-3.72L12 15l5-2.73v3.72z"/>
+                </svg>
+                AgoraTalk
+            </h1>
+            <p>Masuk untuk melanjutkan</p>
+        </div>
+        
+        <div class="login-form">
+            <form method="post" id="loginForm">
+                {% csrf_token %}
+                
+                <div class="form-group">
+                    <label class="form-label" for="username">Username</label>
+                    <input 
+                        type="text" 
+                        class="form-input" 
+                        id="username"
+                        name="username"
+                        placeholder="Masukkan username Anda"
+                        required
+                        autocomplete="username"
+                    >
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="password">Password</label>
+                    <input 
+                        type="password" 
+                        class="form-input" 
+                        id="password"
+                        name="password"
+                        placeholder="Masukkan password Anda"
+                        required
+                        autocomplete="current-password"
+                    >
+                </div>
+                
+                <button type="submit" class="login-btn">
+                    Masuk
+                </button>
+            </form>
+            
+            <div class="forgot-password">
+                <a href="#">Lupa password?</a>
+            </div>
+            
+            <div class="divider">
+                <span>atau</span>
+            </div>
+            
+            <a href="{% url 'register' %}" class="register-btn">
+                Daftar Akun Baru
+            </a>
+            
+            <div class="terms">
+                Dengan masuk, Anda menyetujui 
+                <a href="#">Syarat & Ketentuan</a> kami
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Error notification akan muncul di sini jika ada error -->
+{% if form.errors %}
+<div class="error-notification" id="errorNotification">
+    <button class="close-btn" onclick="closeErrorNotification()">&times;</button>
+    <div class="error-title">
+        <svg class="icon" viewBox="0 0 24 24">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+        </svg>
+        Login Gagal
+    </div>
+    <div class="error-message">
+        Username atau password yang Anda masukkan salah. Silakan coba lagi.
+    </div>
+</div>
+{% endif %}
+
+<script>
+// Auto close error notification
+function closeErrorNotification() {
+    const notification = document.getElementById('errorNotification');
+    if (notification) {
+        notification.classList.add('slide-out');
+        setTimeout(() => {
+            notification.remove();
+        }, 300);
+    }
+}
+
+// Auto close after 5 seconds
+if (document.getElementById('errorNotification')) {
+    setTimeout(() => {
+        closeErrorNotification();
+    }, 5000);
+}
+
+// Form validation feedback
+document.getElementById('loginForm').addEventListener('submit', function(e) {
+    const username = document.getElementById('username').value.trim();
+    const password = document.getElementById('password').value.trim();
+    
+    if (!username || !password) {
+        e.preventDefault();
+        showErrorNotification('Mohon lengkapi username dan password');
+    }
+});
+
+function showErrorNotification(message) {
+    // Remove existing notification
+    const existing = document.getElementById('errorNotification');
+    if (existing) {
+        existing.remove();
+    }
+    
+    // Create new notification
+    const notification = document.createElement('div');
+    notification.className = 'error-notification';
+    notification.id = 'errorNotification';
+    notification.innerHTML = `
+        <button class="close-btn" onclick="closeErrorNotification()">&times;</button>
+        <div class="error-title">
+            <svg class="icon" viewBox="0 0 24 24">
+                <path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/>
+            </svg>
+            Perhatian
+        </div>
+        <div class="error-message">${message}</div>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    // Auto close after 5 seconds
+    setTimeout(() => {
+        closeErrorNotification();
+    }, 5000);
+}
+</script>
+{% endblock %}

@@ -1,0 +1,33 @@
+{% comment %} admin/login.html {% endcomment %}
+
+{% extends "admin/base_site.html" %}
+{% load i18n static %}
+
+{% block content %}
+<div class="login">
+    <div class="login-header">
+        <h1>{% trans 'Admin Login' %}</h1>
+    </div>
+    
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+    
+    <form method="post">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="username">{% trans 'Username:' %}</label>
+            <input type="text" name="username" id="username" class="form-control" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="password">{% trans 'Password:' %}</label>
+            <input type="password" name="password" id="password" class="form-control" required>
+        </div>
+        
+        <button type="submit" class="btn btn-primary">{% trans 'Login' %}</button>
+    </form>
+</div>
+{% endblock %}
