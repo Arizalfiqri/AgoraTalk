@@ -631,9 +631,15 @@
     </div>
     <div class="error-message">
         {% for field, errors in form.errors.items %}
-            {% for error in errors %}
-                {{ error }}{% if not forloop.last %}<br>{% endif %}
-            {% endfor %}
+            {% if field == '__all__' %}
+                {% for error in errors %}
+                    {{ error }}{% if not forloop.last %}<br>{% endif %}
+                {% endfor %}
+            {% else %}
+                {% for error in errors %}
+                    {{ field|capfirst }}: {{ error }}{% if not forloop.last %}<br>{% endif %}
+                {% endfor %}
+            {% endif %}
         {% endfor %}
     </div>
 </div>

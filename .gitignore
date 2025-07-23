@@ -1,0 +1,16 @@
+db.sqlite3
+media/
+__pycache__/
+*.pyc
+venv/
+env/
+.vscode/
+debug.log
+config/settings.py
+config/urls.py
+media/avatars/*
+!media/avatars/.gitkeep
+media/thread_images/*
+!media/thread_images/.gitkeep
+forum/migrations/*
+!forum/migrations/.gitkeep

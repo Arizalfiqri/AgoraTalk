@@ -4,10 +4,9 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
-from forum.admin import admin_site  # Import custom admin site
 
 urlpatterns = [
-    path('admin/', admin_site.urls),  # Custom admin site
+    path('admin/', admin.site.urls),  # Standard Django admin
     path('', include('forum.urls')),
 ]
 

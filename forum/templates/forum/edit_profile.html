@@ -1,0 +1,300 @@
+{% extends 'forum/base.html' %}
+{% load static %}
+
+{% block title %}Edit Profil - AgoraTalk{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- Header -->
+            <div class="d-flex align-items-center mb-4">
+                <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary me-3">
+                    <i class="fas fa-arrow-left"></i>
+                </a>
+                <div>
+                    <h2 class="mb-0"><i class="fas fa-user-edit me-2"></i>Edit Profil</h2>
+                    <small class="text-muted">Perbarui informasi profil Anda</small>
+                </div>
+            </div>
+
+            <!-- Profile Form -->
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-user-cog me-2"></i>Informasi Profil
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        
+                        <!-- Current Avatar Display -->
+                        <div class="row mb-4">
+                            <div class="col-md-3 text-center">
+                                <div class="avatar-preview mb-3">
+                                    {% if user.avatar %}
+                                        <img src="{{ user.avatar.url }}" class="rounded-circle img-thumbnail" style="width: 120px; height: 120px; object-fit: cover;" alt="Avatar">
+                                    {% else %}
+                                        <div class="bg-secondary rounded-circle d-flex align-items-center justify-content-center mx-auto" style="width: 120px; height: 120px;">
+                                            <i class="fas fa-user text-white fa-3x"></i>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                <small class="text-muted">Avatar saat ini</small>
+                            </div>
+                            <div class="col-md-9">
+                                <div class="mb-3">
+                                    <label for="{{ form.avatar.id_for_label }}" class="form-label">
+                                        <i class="fas fa-camera me-2"></i>Ganti Avatar
+                                    </label>
+                                    {{ form.avatar }}
+                                    {% if form.avatar.errors %}
+                                        <div class="text-danger small mt-1">
+                                            {% for error in form.avatar.errors %}
+                                                <div>{{ error }}</div>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                    <small class="form-text text-muted">
+                                        Format yang didukung: JPG, PNG, GIF. Maksimal 2MB.
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Personal Information -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h6 class="border-bottom pb-2 mb-3">
+                                    <i class="fas fa-id-card me-2"></i>Informasi Pribadi
+                                </h6>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="{{ form.first_name.id_for_label }}" class="form-label">Nama Depan</label>
+                                    {{ form.first_name }}
+                                    {% if form.first_name.errors %}
+                                        <div class="text-danger small mt-1">
+                                            {% for error in form.first_name.errors %}
+                                                <div>{{ error }}</div>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="{{ form.last_name.id_for_label }}" class="form-label">Nama Belakang</label>
+                                    {{ form.last_name }}
+                                    {% if form.last_name.errors %}
+                                        <div class="text-danger small mt-1">
+                                            {% for error in form.last_name.errors %}
+                                                <div>{{ error }}</div>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="mb-3">
+                                    <label for="{{ form.email.id_for_label }}" class="form-label">Email</label>
+                                    {{ form.email }}
+                                    {% if form.email.errors %}
+                                        <div class="text-danger small mt-1">
+                                            {% for error in form.email.errors %}
+                                                <div>{{ error }}</div>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="mb-3">
+                                    <label for="{{ form.bio.id_for_label }}" class="form-label">Bio</label>
+                                    {{ form.bio }}
+                                    {% if form.bio.errors %}
+                                        <div class="text-danger small mt-1">
+                                            {% for error in form.bio.errors %}
+                                                <div>{{ error }}</div>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                    <small class="form-text text-muted">
+                                        Ceritakan sedikit tentang diri Anda (maksimal 500 karakter).
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Academic Information -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h6 class="border-bottom pb-2 mb-3">
+                                    <i class="fas fa-graduation-cap me-2"></i>Informasi Akademik
+                                </h6>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="{{ form.jurusan.id_for_label }}" class="form-label">Jurusan</label>
+                                    {{ form.jurusan }}
+                                    {% if form.jurusan.errors %}
+                                        <div class="text-danger small mt-1">
+                                            {% for error in form.jurusan.errors %}
+                                                <div>{{ error }}</div>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="{{ form.angkatan.id_for_label }}" class="form-label">Angkatan</label>
+                                    {{ form.angkatan }}
+                                    {% if form.angkatan.errors %}
+                                        <div class="text-danger small mt-1">
+                                            {% for error in form.angkatan.errors %}
+                                                <div>{{ error }}</div>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Social Media -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h6 class="border-bottom pb-2 mb-3">
+                                    <i class="fas fa-share-alt me-2"></i>Media Sosial
+                                </h6>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="{{ form.instagram.id_for_label }}" class="form-label">
+                                        <i class="fab fa-instagram me-2"></i>Instagram
+                                    </label>
+                                    {{ form.instagram }}
+                                    {% if form.instagram.errors %}
+                                        <div class="text-danger small mt-1">
+                                            {% for error in form.instagram.errors %}
+                                                <div>{{ error }}</div>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="{{ form.linkedin.id_for_label }}" class="form-label">
+                                        <i class="fab fa-linkedin me-2"></i>LinkedIn
+                                    </label>
+                                    {{ form.linkedin }}
+                                    {% if form.linkedin.errors %}
+                                        <div class="text-danger small mt-1">
+                                            {% for error in form.linkedin.errors %}
+                                                <div>{{ error }}</div>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Form Actions -->
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary">
+                                <i class="fas fa-times me-2"></i>Batal
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i>Simpan Perubahan
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Tips Card -->
+            <div class="card mt-4">
+                <div class="card-header bg-info text-white">
+                    <h6 class="card-title mb-0">
+                        <i class="fas fa-lightbulb me-2"></i>Tips Profil
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6><i class="fas fa-check-circle text-success me-2"></i>Profil Lengkap</h6>
+                            <ul class="list-unstyled small text-muted">
+                                <li>• Tambahkan foto profil yang menarik</li>
+                                <li>• Tulis bio yang informatif</li>
+                                <li>• Lengkapi informasi akademik</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h6><i class="fas fa-shield-alt text-warning me-2"></i>Keamanan</h6>
+                            <ul class="list-unstyled small text-muted">
+                                <li>• Jangan bagikan informasi pribadi sensitif</li>
+                                <li>• Gunakan email yang valid</li>
+                                <li>• Periksa pengaturan privasi</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.avatar-preview img {
+    border: 3px solid #dee2e6;
+    transition: all 0.3s ease;
+}
+
+.avatar-preview img:hover {
+    border-color: var(--bs-primary);
+    transform: scale(1.05);
+}
+
+.card {
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    border: none;
+}
+
+.card-header {
+    border-bottom: 1px solid rgba(255,255,255,0.2);
+}
+
+.form-control:focus {
+    border-color: var(--bs-primary);
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+}
+
+.btn {
+    transition: all 0.3s ease;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.border-bottom {
+    border-color: #dee2e6 !important;
+}
+
+h6 {
+    color: #495057;
+    font-weight: 600;
+}
+
+.text-danger {
+    font-size: 0.875rem;
+}
+
+.form-text {
+    font-size: 0.75rem;
+}
+</style>
+{% endblock %}

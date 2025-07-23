@@ -1,327 +1,588 @@
-{% extends 'forum/base.html' %}
-{% load static %}
-
-{% block title %}Buat Thread Baru - AgoraTalk{% endblock %}
-
-{% block extra_css %}
+{% extends 'forum/base.html' %} {% load static %} {% block title %}Buat Thread
+Baru - AgoraTalk{% endblock %} {% block extra_css %}
 <style>
-    .create-thread-card {
-        border: none;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        border-radius: 10px;
+  .required-field::after {
+    content: " *";
+    color: #dc2626;
+  }
+
+  /* Custom styles for form elements */
+  .form-control,
+  .form-select {
+    border: 2px solid #e5e7eb;
+    border-radius: 0.5rem;
+    padding: 0.75rem 1rem;
+    transition: all 0.3s ease;
+  }
+
+  .form-control:focus,
+  .form-select:focus {
+    outline: none;
+    border-color: #06b6d4;
+    box-shadow: 0 0 0 0.2rem rgba(6, 182, 212, 0.15);
+  }
+
+  /* Line clamp utilities */
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .line-clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  /* Button hover effects */
+  .btn-primary {
+    transition: all 0.3s ease;
+  }
+
+  .btn-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(147, 211, 8, 0.3);
+  }
+
+  /* Form animations */
+  .form-card {
+    transition: all 0.3s ease;
+  }
+
+  .form-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  }
+
+  /* File upload styling */
+  .file-upload-area {
+    transition: all 0.3s ease;
+    position: relative;
+  }
+
+  .file-upload-area:hover {
+    border-color: #93d308;
+    background-color: #f0f9ff;
+  }
+
+  /* Style untuk input file yang visible */
+  input[type="file"] {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    background-color: white;
+    font-size: 14px;
+  }
+
+  input[type="file"]:focus {
+    outline: none;
+    border-color: #06b6d4;
+    box-shadow: 0 0 0 2px rgba(6, 182, 212, 0.1);
+  }
+
+  #dropArea {
+    transition: all 0.3s ease;
+  }
+
+  #dropArea.dragover {
+    border-color: #3b82f6 !important;
+    background-color: #eff6ff !important;
+  }
+
+  /* Custom select styling */
+  .form-select {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+    background-position: right 0.5rem center;
+    background-repeat: no-repeat;
+    background-size: 1.5em 1.5em;
+    padding-right: 2.5rem;
+  }
+
+  /* Responsive grid adjustments */
+  @media (max-width: 1024px) {
+    .lg\\:col-span-2 {
+      grid-column: span 1;
     }
-    
-    .form-label {
-        font-weight: 600;
-        color: #495057;
-        margin-bottom: 8px;
-    }
-    
-    .form-control, .form-select {
-        border: 2px solid #e9ecef;
-        border-radius: 8px;
-        padding: 12px 16px;
-        transition: all 0.3s ease;
-    }
-    
-    .form-control:focus, .form-select:focus {
-        border-color: #0d6efd;
-        box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.15);
-    }
-    
-    .btn-primary {
-        background: linear-gradient(135deg, #0d6efd 0%, #0056b3 100%);
-        border: none;
-        border-radius: 8px;
-        padding: 12px 30px;
-        font-weight: 600;
-        transition: all 0.3s ease;
-    }
-    
-    .btn-primary:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 15px rgba(13, 110, 253, 0.3);
-    }
-    
-    .btn-outline-secondary {
-        border: 2px solid #6c757d;
-        border-radius: 8px;
-        padding: 12px 30px;
-        font-weight: 600;
-        transition: all 0.3s ease;
-    }
-    
-    .help-text {
-        font-size: 0.875rem;
-        color: #6c757d;
-        margin-top: 5px;
-    }
-    
-    .page-header {
-        background: linear-gradient(135deg, #0d6efd 0%, #0056b3 100%);
-        color: white;
-        padding: 40px 0;
-        margin-bottom: 30px;
-        border-radius: 0 0 20px 20px;
-    }
-    
-    .required-field::after {
-        content: " *";
-        color: #dc3545;
-    }
-    
-    .category-info {
-        background-color: #f8f9fa;
-        border-left: 4px solid #0d6efd;
-        padding: 15px;
-        border-radius: 8px;
-        margin-bottom: 20px;
-    }
-    
-    @media (max-width: 768px) {
-        .page-header {
-            padding: 20px 0;
-            margin-bottom: 20px;
-        }
-        
-        .btn-primary, .btn-outline-secondary {
-            width: 100%;
-            margin-bottom: 10px;
-        }
-    }
+  }
 </style>
-{% endblock %}
+{% endblock %} {% block content %}
+<!-- Page Header with Banner Design matching thread_list.html -->
+<div class="max-w-7xl mx-auto px-6 sm:px-8 lg:px-10">
+  <div class="mb-8">
+    <div
+      class="relative text-white rounded-xl overflow-hidden"
+      style="
+        background: url('{% static 'images/background_glass.jpg' %}')
+          center/cover no-repeat;
+        background-blend-mode: overlay;
+        background-color: rgba(9, 63, 180, 0.7);
+      "
+    >
+        <!-- Gradient Overlay Layer (matching navbar gradient) -->
+        <div
+          class="absolute inset-0"
+          style="
+            background: linear-gradient(
+              90deg,
+              #b12ad5 0%,
+              #5247a3 50%,
+              #60cac5 100%
+            );
+            opacity: 0.85;
+          "
+        ></div>
 
-{% block content %}
-<!-- Page Header -->
-<div class="page-header">
-    <div class="container">
-        <div class="row align-items-center">
-            <div class="col-12">
-                <h1 class="mb-0">
-                    <i class="fas fa-plus-circle me-3"></i>Buat Thread Baru
-                </h1>
-                <p class="mb-0 mt-2 opacity-75">Bagikan pertanyaan, diskusi, atau topik menarik dengan komunitas</p>
+      <!-- Background Pattern -->
+      <div class="absolute inset-0 opacity-10">
+        <svg class="w-full h-full" viewBox="0 0 15 30" fill="none">
+          <defs>
+            <pattern
+              id="grid-create"
+              width="5"
+              height="5"
+              patternUnits="userSpaceOnUse"
+            >
+              <circle cx="2.0" cy="2.0" r="0.5" fill="currentColor" />
+            </pattern>
+          </defs>
+          <rect width="100" height="100" fill="url(#grid-create)" />
+        </svg>
+      </div>
+
+      <!-- Content -->
+      <div class="relative p-6 lg:p-8">
+        <div
+          class="flex flex-col lg:flex-row justify-between items-start lg:items-center"
+        >
+          <div class="flex items-center mb-4 lg:mb-0">
+            <div class="bg-white/20 backdrop-blur-sm rounded-full p-3 mr-3">
+              <i class="fas fa-plus-circle text-xl text-white"></i>
             </div>
+            <div>
+              <h1 class="text-2xl lg:text-3xl font-bold leading-tight">
+                Buat Thread Baru
+              </h1>
+              <p class="mt-1" style="color: #fffcfb">
+                Bagikan pertanyaan, diskusi, atau topik menarik dengan komunitas
+              </p>
+            </div>
+          </div>
+          <div class="mt-4 lg:mt-0">
+            <a
+              href="{% url 'thread_list' %}"
+              class="group relative overflow-hidden text-white px-6 py-3 rounded-lg font-semibold flex items-center"
+              style="
+                background: linear-gradient(135deg, #93d308 0%, #a0e609 100%);
+                color: #fffcfb;
+              "
+            >
+              <span class="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-in-out"></span>
+              <i class="fas fa-arrow-left mr-2 relative z-10"></i>
+              <span class="relative z-10">Kembali ke Forum</span>
+            </a>
+          </div>
         </div>
+
+        <!-- Trust Indicators -->
+        <div class="flex flex-wrap items-center gap-4 mt-4" style="color: #ffd8d8">
+          <div class="flex items-center">
+            <i class="fas fa-shield-check mr-2 text-sm" style="color: #ffd8d8"></i>
+            <span class="text-xs font-medium">Platform Aman</span>
+          </div>
+          <div class="flex items-center">
+            <i class="fas fa-users mr-2 text-sm" style="color: #ffd8d8"></i>
+            <span class="text-xs font-medium">Komunitas Aktif</span>
+          </div>
+          <div class="flex items-center">
+            <i class="fas fa-graduation-cap mr-2 text-sm" style="color: #ffd8d8"></i>
+            <span class="text-xs font-medium">Fokus Akademik</span>
+          </div>
+        </div>
+      </div>
     </div>
-</div>
+  </div>
 
-<div class="container">
-    <div class="row justify-content-center">
-        <div class="col-lg-8">
-            <!-- Tips Card -->
-            <div class="category-info">
-                <h6 class="mb-2">
-                    <i class="fas fa-lightbulb text-warning me-2"></i>Tips Membuat Thread yang Baik
-                </h6>
-                <ul class="mb-0 small">
-                    <li>Gunakan judul yang jelas dan deskriptif</li>
-                    <li>Pilih kategori yang sesuai dengan topik</li>
-                    <li>Gunakan tags untuk memudahkan pencarian</li>
-                    <li>Jelaskan masalah atau topik dengan detail yang cukup</li>
-                </ul>
-            </div>
 
-            <!-- Form Card -->
-            <div class="card create-thread-card">
-                <div class="card-header bg-white border-0 py-4">
-                    <h5 class="card-title mb-0">
-                        <i class="fas fa-edit text-primary me-2"></i>Form Thread Baru
-                    </h5>
+  <div class="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
+    <!-- Main Layout: Form on Left, Sidebar on Right -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <!-- Left Column: Main Form -->
+      <div class="lg:col-span-2">
+        <!-- Form Card -->
+        <div
+          class="form-card bg-white rounded-lg border border-gray-100 overflow-hidden shadow-md"
+        >
+          <div
+            class="bg-gradient-to-r from-gray-50 to-white border-b border-gray-100 px-6 py-4"
+          >
+            <h5 class="text-base font-bold text-gray-800 flex items-center">
+              <i class="fas fa-edit mr-2 text-cyan-600"></i>Buat Post
+            </h5>
+          </div>
+
+          <div class="p-6">
+            <form
+              method="post"
+              enctype="multipart/form-data"
+              id="createThreadForm"
+              class="space-y-5"
+            >
+              {% csrf_token %}
+
+              <!-- Judul Thread -->
+              <div>
+                <label
+                  for="{{ form.title.id_for_label }}"
+                  class="block text-sm font-bold text-gray-800 mb-2 required-field"
+                >
+                  Judul
+                </label>
+                {{ form.title }}
+                <div class="mt-1 text-xs text-gray-600">
+                  Tulis judul yang menarik ya
                 </div>
-                
-                <div class="card-body p-4">
-                    <form method="post" id="createThreadForm">
-                        {% csrf_token %}
-                        
-                        <!-- Judul Thread -->
-                        <div class="mb-4">
-                            <label for="{{ form.title.id_for_label }}" class="form-label required-field">
-                                <i class="fas fa-heading me-2"></i>Judul Thread
-                            </label>
-                            {{ form.title }}
-                            <div class="help-text">
-                                <i class="fas fa-info-circle me-1"></i>
-                                Buat judul yang menarik dan menggambarkan isi thread dengan jelas
-                            </div>
-                            {% if form.title.errors %}
-                                <div class="text-danger small mt-1">
-                                    {% for error in form.title.errors %}
-                                        <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
-                                    {% endfor %}
-                                </div>
-                            {% endif %}
-                        </div>
-
-                        <!-- Kategori -->
-                        <div class="mb-4">
-                            <label for="{{ form.category.id_for_label }}" class="form-label required-field">
-                                <i class="fas fa-folder me-2"></i>Kategori
-                            </label>
-                            {{ form.category }}
-                            <div class="help-text">
-                                <i class="fas fa-info-circle me-1"></i>
-                                Pilih kategori yang paling sesuai dengan topik thread Anda
-                            </div>
-                            {% if form.category.errors %}
-                                <div class="text-danger small mt-1">
-                                    {% for error in form.category.errors %}
-                                        <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
-                                    {% endfor %}
-                                </div>
-                            {% endif %}
-                        </div>
-
-                        <!-- Tags -->
-                        <div class="mb-4">
-                            <label for="{{ form.tags.id_for_label }}" class="form-label">
-                                <i class="fas fa-tags me-2"></i>Tags
-                            </label>
-                            {{ form.tags }}
-                            <div class="help-text">
-                                <i class="fas fa-info-circle me-1"></i>
-                                Pisahkan setiap tag dengan koma. Contoh: python, django, web development
-                            </div>
-                            {% if form.tags.errors %}
-                                <div class="text-danger small mt-1">
-                                    {% for error in form.tags.errors %}
-                                        <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
-                                    {% endfor %}
-                                </div>
-                            {% endif %}
-                        </div>
-
-                        <!-- Konten Thread -->
-                        <div class="mb-4">
-                            <label for="{{ form.content.id_for_label }}" class="form-label required-field">
-                                <i class="fas fa-align-left me-2"></i>Isi Thread
-                            </label>
-                            {{ form.content }}
-                            <div class="help-text">
-                                <i class="fas fa-info-circle me-1"></i>
-                                Jelaskan topik, pertanyaan, atau masalah Anda dengan detail yang cukup
-                            </div>
-                            {% if form.content.errors %}
-                                <div class="text-danger small mt-1">
-                                    {% for error in form.content.errors %}
-                                        <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
-                                    {% endfor %}
-                                </div>
-                            {% endif %}
-                        </div>
-
-                        <!-- Action Buttons -->
-                        <div class="d-flex justify-content-between align-items-center pt-3 border-top">
-                            <div class="text-muted small">
-                                <i class="fas fa-gift me-1"></i>
-                                Anda akan mendapat <strong>10 poin</strong> setelah thread dipublikasi
-                            </div>
-                            <div class="btn-group">
-                                <button type="submit" class="btn btn-primary">
-                                    <i class="fas fa-paper-plane me-2"></i>Publikasikan Thread
-                                </button>
-                                <a href="{% url 'thread_list' %}" class="btn btn-outline-secondary">
-                                    <i class="fas fa-times me-2"></i>Batal
-                                </a>
-                            </div>
-                        </div>
-                    </form>
+                {% if form.title.errors %}
+                <div class="mt-1 text-red-600 text-xs">
+                  {% for error in form.title.errors %}
+                  <div class="flex items-center">
+                    <i class="fas fa-exclamation-circle mr-1 text-xs"></i>
+                    {{ error }}
+                  </div>
+                  {% endfor %}
                 </div>
-            </div>
+                {% endif %}
+              </div>
 
-            <!-- Guidelines Card -->
-            <div class="card mt-4 border-0">
-                <div class="card-body bg-light">
-                    <h6 class="card-title">
-                        <i class="fas fa-shield-alt text-success me-2"></i>Pedoman Komunitas
-                    </h6>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <ul class="list-unstyled small mb-0">
-                                <li class="mb-1"><i class="fas fa-check text-success me-2"></i>Gunakan bahasa yang sopan dan santun</li>
-                                <li class="mb-1"><i class="fas fa-check text-success me-2"></i>Hindari spam dan konten duplikat</li>
-                                <li class="mb-1"><i class="fas fa-check text-success me-2"></i>Berikan informasi yang akurat</li>
-                            </ul>
+              <!-- Upload Gambar -->
+              <div>
+                <label
+                  for="{{ form.image.id_for_label }}"
+                  class="block text-sm font-bold text-gray-800 mb-2"
+                >
+                  Gambar
+                </label>
+
+                <!-- File input dengan struktur yang kompatibel dengan script.js -->
+                <div class="space-y-3">
+                  <!-- File input (akan disembunyikan oleh script.js) -->
+                  {{ form.image }}
+
+                  <!-- Upload placeholder (dibutuhkan oleh script.js) -->
+                  <div
+                    id="upload-placeholder"
+                    class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-gray-400 transition-colors cursor-pointer"
+                    onclick="document.getElementById('id_image').click();"
+                  >
+                    <i
+                      class="fas fa-cloud-upload-alt text-3xl text-gray-400 mb-2"
+                    ></i>
+                    <p class="text-gray-600 text-sm">
+                      Drag gambarmu ke sini atau
+                      <span class="font-semibold text-blue-600">Upload</span>
+                    </p>
+                  </div>
+
+                  <!-- Image preview (dibutuhkan oleh script.js) -->
+                  <div
+                    id="image-preview"
+                    class="hidden border-2 border-dashed border-green-300 rounded-lg p-4"
+                  >
+                    <div class="flex items-center justify-between">
+                      <div class="flex items-center">
+                        <img
+                          id="preview-img"
+                          src=""
+                          alt="Preview"
+                          class="w-16 h-16 object-cover rounded mr-3"
+                        />
+                        <div>
+                          <p class="text-sm font-medium text-gray-700">
+                            Gambar dipilih
+                          </p>
+                          <p class="text-xs text-gray-500">
+                            Klik remove untuk menghapus
+                          </p>
                         </div>
-                        <div class="col-md-6">
-                            <ul class="list-unstyled small mb-0">
-                                <li class="mb-1"><i class="fas fa-times text-danger me-2"></i>Jangan posting konten yang melanggar hukum</li>
-                                <li class="mb-1"><i class="fas fa-times text-danger me-2"></i>Hindari konten yang menyinggung SARA</li>
-                                <li class="mb-1"><i class="fas fa-times text-danger me-2"></i>Jangan berbagi informasi pribadi</li>
-                            </ul>
-                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        id="remove-image"
+                        class="text-red-600 hover:text-red-800 p-2"
+                      >
+                        <i class="fas fa-times"></i>
+                      </button>
                     </div>
+                  </div>
                 </div>
-            </div>
-        </div>
-    </div>
-</div>
-{% endblock %}
 
-{% block extra_js %}
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Auto-resize textarea
-    const textarea = document.querySelector('#id_content');
-    if (textarea) {
-        textarea.addEventListener('input', function() {
-            this.style.height = 'auto';
-            this.style.height = this.scrollHeight + 'px';
-        });
+                <div class="mt-1 text-xs text-gray-600">
+                  Maks 10 MB • 20 Gambar. Tahun dan Drag gambar untuk atur
+                  urutan
+                </div>
+                {% if form.image.errors %}
+                <div class="mt-1 text-red-600 text-xs">
+                  {% for error in form.image.errors %}
+                  <div class="flex items-center">
+                    <i class="fas fa-exclamation-circle mr-1 text-xs"></i>{{
+                    error }}
+                  </div>
+                  {% endfor %}
+                </div>
+                {% endif %}
+              </div>
+
+              <!-- Konten Thread -->
+              <div>
+                <label
+                  for="{{ form.content.id_for_label }}"
+                  class="block text-sm font-bold text-gray-800 mb-2 required-field"
+                >
+                  Deskripsi
+                </label>
+                {{ form.content }}
+                <div class="mt-1 text-xs text-gray-600">
+                  Karena semua butuh penjelasan (optional)
+                </div>
+                <div class="mt-2 text-right text-xs text-gray-500">2000</div>
+                {% if form.content.errors %}
+                <div class="mt-1 text-red-600 text-xs">
+                  {% for error in form.content.errors %}
+                  <div class="flex items-center">
+                    <i class="fas fa-exclamation-circle mr-1 text-xs"></i>{{
+                    error }}
+                  </div>
+                  {% endfor %}
+                </div>
+                {% endif %}
+              </div>
+
+              <!-- Kategori -->
+              <div>
+                <label
+                  for="{{ form.category.id_for_label }}"
+                  class="block text-sm font-bold text-gray-800 mb-2 required-field"
+                >
+                  <i class="fas fa-folder mr-2 text-cyan-600 text-sm"></i
+                  >Komunitas
+                </label>
+                {{ form.category }}
+                <div class="mt-1 text-xs text-gray-600">
+                  Pilih komunitas yang sesuai dengan topik thread Anda
+                </div>
+                {% if form.category.errors %}
+                <div class="mt-1 text-red-600 text-xs">
+                  {% for error in form.category.errors %}
+                  <div class="flex items-center">
+                    <i class="fas fa-exclamation-circle mr-1 text-xs"></i>{{
+                    error }}
+                  </div>
+                  {% endfor %}
+                </div>
+                {% endif %}
+              </div>
+
+              <!-- Tags -->
+              <div>
+                <label
+                  for="{{ form.tags.id_for_label }}"
+                  class="block text-sm font-bold text-gray-800 mb-2"
+                >
+                  <i class="fas fa-tags mr-2 text-cyan-600 text-sm"></i>Tags
+                </label>
+                {{ form.tags }}
+                <div class="mt-1 text-xs text-gray-600">
+                  Pisahkan setiap tag dengan koma. Contoh: python, django, web
+                  development
+                </div>
+                {% if form.tags.errors %}
+                <div class="mt-1 text-red-600 text-xs">
+                  {% for error in form.tags.errors %}
+                  <div class="flex items-center">
+                    <i class="fas fa-exclamation-circle mr-1 text-xs"></i>{{
+                    error }}
+                  </div>
+                  {% endfor %}
+                </div>
+                {% endif %}
+              </div>
+
+              <!-- Action Buttons -->
+              <div class="flex justify-end pt-4 border-t border-gray-200">
+                <div class="flex gap-2">
+                  <a
+                    href="{% url 'thread_list' %}"
+                    class="bg-white border border-gray-300 text-gray-700 px-6 py-2 rounded-lg font-semibold hover:bg-gray-50 transition-all duration-300 text-sm"
+                  >
+                    Batal
+                  </a>
+                  <button
+                    type="submit"
+                    class="text-white px-6 py-2 rounded-lg font-semibold transition-all duration-300 text-sm"
+                    style="background-color: #3498db"
+                  >
+                    Post
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column: Sidebar -->
+      <div class="space-y-6">
+        <!-- Tips Card -->
+        <div
+          class="bg-white rounded-lg border border-gray-100 overflow-hidden shadow-md"
+        >
+          <div
+            class="bg-gradient-to-r from-yellow-50 to-orange-50 border-b border-gray-100 px-4 py-3"
+          >
+            <h6 class="text-sm font-bold text-gray-800 flex items-center">
+              <i class="fas fa-lightbulb text-yellow-500 mr-2"></i>Membuat
+              Konten di AgoraTalk
+            </h6>
+          </div>
+          <div class="p-4">
+            <ul class="text-gray-700 space-y-2 text-sm">
+              <li class="flex items-start">
+                <span class="text-blue-500 mr-2">•</span>
+                <span>Please be nice, No SARA, No Porn.</span>
+              </li>
+              <li class="flex items-start">
+                <span class="text-blue-500 mr-2">•</span>
+                <span>Jangan lupa baca peraturan komunitas setempat ya.</span>
+              </li>
+              <li class="flex items-start">
+                <span class="text-blue-500 mr-2">•</span>
+                <span
+                  >Perhatikan
+                  <a href="#" class="text-blue-500 hover:underline"
+                    >syarat dan ketentuan umum</a
+                  >
+                  AgoraTalk.</span
+                >
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Guidelines Card -->
+        <div
+          class="bg-white rounded-lg border border-gray-100 overflow-hidden shadow-md"
+        >
+          <div
+            class="bg-gradient-to-r from-green-50 to-emerald-50 border-b border-gray-100 px-4 py-3"
+          >
+            <h6 class="text-sm font-bold text-gray-800 flex items-center">
+              <i class="fas fa-shield-alt mr-2 text-green-600"></i>Pedoman
+              Komunitas
+            </h6>
+          </div>
+          <div class="p-4">
+            <div class="space-y-4">
+              <div>
+                <h6
+                  class="text-sm font-bold text-green-700 mb-2 flex items-center"
+                >
+                  <i class="fas fa-check-circle mr-2 text-xs"></i>Yang
+                  Dianjurkan
+                </h6>
+                <ul class="space-y-1">
+                  <li class="flex items-start">
+                    <i
+                      class="fas fa-check text-green-500 mr-2 mt-0.5 text-xs"
+                    ></i>
+                    <span class="text-gray-700 text-xs"
+                      >Gunakan bahasa yang sopan dan santun</span
+                    >
+                  </li>
+                  <li class="flex items-start">
+                    <i
+                      class="fas fa-check text-green-500 mr-2 mt-0.5 text-xs"
+                    ></i>
+                    <span class="text-gray-700 text-xs"
+                      >Hindari spam dan konten duplikat</span
+                    >
+                  </li>
+                  <li class="flex items-start">
+                    <i
+                      class="fas fa-check text-green-500 mr-2 mt-0.5 text-xs"
+                    ></i>
+                    <span class="text-gray-700 text-xs"
+                      >Berikan informasi yang akurat</span
+                    >
+                  </li>
+                </ul>
+              </div>
+              <div>
+                <h6
+                  class="text-sm font-bold text-red-700 mb-2 flex items-center"
+                >
+                  <i class="fas fa-times-circle mr-2 text-xs"></i>Yang Tidak
+                  Diperbolehkan
+                </h6>
+                <ul class="space-y-1">
+                  <li class="flex items-start">
+                    <i
+                      class="fas fa-times text-red-500 mr-2 mt-0.5 text-xs"
+                    ></i>
+                    <span class="text-gray-700 text-xs"
+                      >Jangan posting konten yang melanggar hukum</span
+                    >
+                  </li>
+                  <li class="flex items-start">
+                    <i
+                      class="fas fa-times text-red-500 mr-2 mt-0.5 text-xs"
+                    ></i>
+                    <span class="text-gray-700 text-xs"
+                      >Hindari konten yang menyinggung SARA</span
+                    >
+                  </li>
+                  <li class="flex items-start">
+                    <i
+                      class="fas fa-times text-red-500 mr-2 mt-0.5 text-xs"
+                    ></i>
+                    <span class="text-gray-700 text-xs"
+                      >Jangan berbagi informasi pribadi</span
+                    >
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endblock %} {% block extra_js %}
+  <script>
+    // File upload sudah ditangani oleh static/js/script.js
+    // Script.js akan menyembunyikan file input dan menangani upload
+
+    // Debug function untuk troubleshooting
+    function debugElements() {
+      console.log("=== DEBUG ELEMENTS ===");
+      console.log("File input:", document.getElementById("id_image"));
+      console.log(
+        "Upload placeholder:",
+        document.getElementById("upload-placeholder")
+      );
+      console.log("Image preview:", document.getElementById("image-preview"));
+      console.log("Preview img:", document.getElementById("preview-img"));
+      console.log("Remove button:", document.getElementById("remove-image"));
     }
-    
-    // Form validation
-    const form = document.getElementById('createThreadForm');
-    form.addEventListener('submit', function(e) {
-        let isValid = true;
-        const requiredFields = ['id_title', 'id_category', 'id_content'];
-        
-        requiredFields.forEach(fieldId => {
-            const field = document.getElementById(fieldId);
-            if (field && !field.value.trim()) {
-                isValid = false;
-                field.classList.add('is-invalid');
-            } else if (field) {
-                field.classList.remove('is-invalid');
-            }
-        });
-        
-        if (!isValid) {
-            e.preventDefault();
-            // Show error toast or alert
-            const alertDiv = document.createElement('div');
-            alertDiv.className = 'alert alert-danger alert-dismissible fade show mt-3';
-            alertDiv.innerHTML = `
-                <i class="fas fa-exclamation-circle me-2"></i>
-                Mohon lengkapi semua field yang wajib diisi.
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            `;
-            form.prepend(alertDiv);
-        }
-    });
-    
-    // Character counter for title
-    const titleField = document.getElementById('id_title');
-    if (titleField) {
-        const maxLength = 255;
-        const counter = document.createElement('div');
-        counter.className = 'small text-muted mt-1';
-        titleField.parentNode.appendChild(counter);
-        
-        function updateCounter() {
-            const remaining = maxLength - titleField.value.length;
-            counter.textContent = `${remaining} karakter tersisa`;
-            if (remaining < 20) {
-                counter.className = 'small text-warning mt-1';
-            } else {
-                counter.className = 'small text-muted mt-1';
-            }
-        }
-        
-        titleField.addEventListener('input', updateCounter);
-        updateCounter();
-    }
-});
-</script>
-{% endblock %}
+
+    // Make debug function globally available
+    window.debugElements = debugElements;
+
+    // Log untuk konfirmasi script berjalan
+    console.log("Create thread page script loaded");
+  </script>
+  {% endblock %}
+</div>

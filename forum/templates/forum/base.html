@@ -1,48 +1,76 @@
-{% load static %}
-{% load humanize %}
+{% load static %} {% load humanize %}
 <!DOCTYPE html>
 <html lang="id" data-bs-theme="light">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{% block title %}Forum Mahasiswa{% endblock %}</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
-    <link href="{% static 'css/custom.css' %}" rel="stylesheet">
+    <link
+      rel="icon"
+      type="image/png"
+      href="{% static 'images/logo_agora.png' %}"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              "edu-primary": "#1e40af",
+              "edu-secondary": "#3b82f6",
+              "edu-accent": "#0ea5e9",
+              "edu-dark": "#1e293b",
+              "edu-light": "#f8fafc",
+            },
+          },
+        },
+      };
+    </script>
+    <link href="{% static 'css/custom.css' %}" rel="stylesheet" />
+    <link href="{% static 'css/style.css' %}" rel="stylesheet" />
     {% block extra_css %}{% endblock %}
-</head>
-<body>
-    {% if request.path != '/login/' and request.path != '/register/' %}
-        {% include "forum/layout/navbar.html" %}
-    {% endif %}
-
-    {% if messages %}
+  </head>
+  <body>
+    {% if request.path != '/login/' and request.path != '/register/' %} 
+    {% include "forum/layout/navbar.html" %} {% endif %} {% if messages %}
     <div class="container mt-3">
-        {% for message in messages %}
-            <div class="alert {{ message.tags }} alert-dismissible fade show" role="alert">
-                {% if message.tags == 'alert-success' %}
-                    <i class="fas fa-check-circle me-2"></i>
-                {% elif message.tags == 'alert-danger' %}
-                    <i class="fas fa-exclamation-circle me-2"></i>
-                {% elif message.tags == 'alert-warning' %}
-                    <i class="fas fa-exclamation-triangle me-2"></i>
-                {% else %}
-                    <i class="fas fa-info-circle me-2"></i>
-                {% endif %}
-                {{ message }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-        {% endfor %}
+      {% for message in messages %}
+      <div
+        class="alert {{ message.tags }} alert-dismissible fade show"
+        role="alert"
+      >
+        {% if message.tags == 'alert-success' %}
+        <i class="fas fa-check-circle me-2"></i>
+        {% elif message.tags == 'alert-danger' %}
+        <i class="fas fa-exclamation-circle me-2"></i>
+        {% elif message.tags == 'alert-warning' %}
+        <i class="fas fa-exclamation-triangle me-2"></i>
+        {% else %}
+        <i class="fas fa-info-circle me-2"></i>
+        {% endif %} {{ message }}
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="alert"
+        ></button>
+      </div>
+      {% endfor %}
     </div>
     {% endif %}
 
-    <main class="container my-4">
-        {% block content %}{% endblock %}
-    </main>
+    <main class="container my-4">{% block content %}{% endblock %}</main>
 
-    {% if request.path != '/login/' and request.path != '/register/' %}
-        {% include "forum/layout/footer.html" %}
-    {% endif %}
+    {% if request.path != '/login/' and request.path != '/register/' %} 
+    {% include "forum/layout/footer.html" %} 
+    {% endif %} 
     {% include "forum/layout/script.html" %}
-</body>
+  </body>
 </html>

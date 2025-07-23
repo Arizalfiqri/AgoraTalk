@@ -1,235 +1,575 @@
-{% extends 'forum/base.html' %}
-{% load humanize %}
-{% load static %}
+{% extends 'forum/base.html' %} {% load humanize %} {% load static %} 
+{% block title %}Beranda - AgoraTalk{% endblock %} {% block content %}
+<div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <!-- Hero Section with Banner Design -->
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+    <div class="lg:col-span-2">
+      <div
+        class="relative text-white rounded-2xl shadow-lg overflow-hidden"
+        style="
+          background: url('{% static 'images/background_glass.jpg' %}')
+            center/cover no-repeat;
+          background-blend-mode: overlay;
+          background-color: rgba(9, 63, 180, 0.7);
+        "
+      >
+        <!-- Gradient Overlay Layer (matching navbar gradient) -->
+        <div
+          class="absolute inset-0"
+          style="
+            background: linear-gradient(
+              90deg,
+              #b12ad5 0%,
+              #5247a3 50%,
+              #60cac5 100%
+            );
+            opacity: 0.85;
+          "
+        ></div>
 
-{% block title %}Beranda - AgoraTalk{% endblock %}
+        <!-- Background Pattern -->
+        <div class="absolute inset-0 opacity-10">
+          <svg class="w-full h-full" viewBox="0 0 100 100" fill="none">
+            <defs>
+              <pattern
+                id="grid"
+                width="10"
+                height="10"
+                patternUnits="userSpaceOnUse"
+              >
+                <circle cx="5" cy="5" r="1" fill="currentColor" />
+              </pattern>
+            </defs>
+            <rect width="100" height="100" fill="url(#grid)" />
+          </svg>
+        </div>
 
-{% block content %}
-<!-- Hero Section -->
-<div class="row mb-5">
-    <div class="col-lg-8">
-        <div class="card bg-primary text-white">
-            <div class="card-body p-4">
-                <h1 class="display-6 fw-bold mb-3">
-                    <i class="fas fa-comments me-2"></i>Selamat Datang di AgoraTalk
-                </h1>
-                <p class="lead mb-4">Tempat mahasiswa Indonesia berbagi informasi, diskusi akademik, dan membangun komunitas</p>
-                {% if not user.is_authenticated %}
-                    <div class="d-flex gap-2">
-                        <a href="{% url 'register' %}" class="btn btn-light btn-lg">
-                            <i class="fas fa-user-plus me-2"></i>Daftar Sekarang
-                        </a>
-                        <a href="{% url 'login' %}" class="btn btn-outline-light btn-lg">
-                            <i class="fas fa-sign-in-alt me-2"></i>Masuk
-                        </a>
-                    </div>
+        <!-- Content -->
+        <div class="relative p-6 lg:p-8">
+          <div class="flex items-center mb-4">
+            <div class="bg-white/20 backdrop-blur-sm rounded-full p-3 mr-3">
+              <i class="fas fa-comments text-xl text-white"></i>
+            </div>
+            <div>
+              <h1 class="text-2xl lg:text-3xl font-bold leading-tight">
+                Selamat Datang di
+                <span class="text-red-200" style="color: #93d308"
+                  >AgoraTalk</span
+                >
+              </h1>
+            </div>
+          </div>
+
+          <p
+            class="text-base lg:text-lg mb-6 leading-relaxed"
+            style="color: #fffcfb"
+          >
+            Platform diskusi terpercaya untuk mahasiswa Indonesia. Berbagi
+            pengetahuan, diskusi akademik, dan membangun komunitas yang solid.
+          </p>
+
+          <!-- Trust Indicators -->
+          <div
+            class="flex flex-wrap items-center gap-4 mb-6"
+            style="color: #ffd8d8"
+          >
+            <div class="flex items-center">
+              <i
+                class="fas fa-shield-check mr-2 text-sm"
+                style="color: #ffd8d8"
+              ></i>
+              <span class="text-xs font-medium">Platform Aman</span>
+            </div>
+            <div class="flex items-center">
+              <i class="fas fa-users mr-2 text-sm" style="color: #ffd8d8"></i>
+              <span class="text-xs font-medium">Komunitas Aktif</span>
+            </div>
+            <div class="flex items-center">
+              <i
+                class="fas fa-graduation-cap mr-2 text-sm"
+                style="color: #ffd8d8"
+              ></i>
+              <span class="text-xs font-medium">Fokus Akademik</span>
+            </div>
+          </div>
+
+          {% if not user.is_authenticated %}
+          <div class="flex flex-col sm:flex-row gap-3">
+            <a
+              href="{% url 'register' %}"
+              class="group text-white px-6 py-3 rounded-xl font-semibold transition-all duration-300 text-center shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
+              style="
+                background: linear-gradient(135deg, #93d308 0%, #a0e609 100%);
+                color: #fffcfb;
+              "
+            >
+              <i
+                class="fas fa-user-plus mr-2 text-sm group-hover:scale-110 transition-transform duration-300"
+              ></i>
+              Bergabung Sekarang
+            </a>
+            <a
+              href="{% url 'login' %}"
+              class="group border-2 text-white px-6 py-3 rounded-xl font-semibold hover:text-white transition-all duration-300 text-center shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
+              style="
+                border-color: #fffcfb;
+                color: #fffcfb;
+                background: rgba(255, 252, 251, 0.1);
+              "
+            >
+              <i
+                class="fas fa-sign-in-alt mr-2 text-sm group-hover:scale-110 transition-transform duration-300"
+              ></i>
+              Masuk
+            </a>
+          </div>
+          {% else %}
+          <a
+            href="{% url 'create_thread' %}"
+            class="group inline-flex items-center text-white px-6 py-3 rounded-xl font-semibold transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
+            style="
+              background: linear-gradient(135deg, #93d308 0%, #a0e609 100%);
+              color: #fffcfb;
+            "
+          >
+            <i
+              class="fas fa-plus mr-2 text-sm group-hover:scale-110 transition-transform duration-300"
+            ></i>
+            Buat Diskusi Baru
+          </a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <div class="lg:col-span-1">
+      <div
+        class="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden"
+      >
+        <div
+          class="px-4 py-3"
+          style="background: linear-gradient(135deg, #5247a3 0%, #5247a3 100%)"
+        >
+          <h5 class="text-base font-bold text-white flex items-center">
+            <i class="fas fa-chart-bar mr-2 text-sm" style="color: #ffd8d8"></i
+            >Statistik Forum
+          </h5>
+        </div>
+        <div class="p-4">
+          <div class="grid grid-cols-3 gap-2">
+            <div
+              class="text-center p-3 bg-gray-50 rounded-xl border border-gray-200"
+            >
+              <div
+                class="w-8 h-8 rounded-full flex items-center justify-center mx-auto mb-2"
+                style="
+                  background: linear-gradient(135deg, #5247a3 0%, #5247a3 100%);
+                "
+              >
+                <i class="fas fa-comments text-white text-xs"></i>
+              </div>
+              <h4 class="text-lg font-bold" style="color: #5247a3">
+                {{ stats.total_threads|floatformat:0 }}
+              </h4>
+              <small class="text-gray-600 font-medium text-xs">Thread</small>
+            </div>
+            <div
+              class="text-center p-3 bg-gray-50 rounded-xl border border-gray-200"
+            >
+              <div
+                class="w-8 h-8 rounded-full flex items-center justify-center mx-auto mb-2"
+                style="
+                  background: linear-gradient(135deg, #93d308 0%, #a0e609 100%);
+                "
+              >
+                <i class="fas fa-users text-white text-xs"></i>
+              </div>
+              <h4 class="text-lg font-bold" style="color: #93d308">
+                {{ stats.total_users|floatformat:0 }}
+              </h4>
+              <small class="text-gray-600 font-medium text-xs">Anggota</small>
+            </div>
+            <div
+              class="text-center p-3 bg-gray-50 rounded-xl border border-gray-200"
+            >
+              <div
+                class="w-8 h-8 rounded-full flex items-center justify-center mx-auto mb-2"
+                style="
+                  background: linear-gradient(135deg, #5247a3 0%, #93d308 100%);
+                "
+              >
+                <i class="fas fa-comment-dots text-white text-xs"></i>
+              </div>
+              <h4 class="text-lg font-bold" style="color: #5247a3">
+                {{ stats.total_comments|floatformat:0 }}
+              </h4>
+              <small class="text-gray-600 font-medium text-xs">Diskusi</small>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Kategori Forum -->
+  <div class="mb-8">
+    <div class="text-center mb-6">
+      <h2 class="text-2xl lg:text-3xl font-bold text-gray-800 mb-3">
+        <span
+          class="bg-clip-text text-transparent"
+          style="
+            background: linear-gradient(90deg, #5247a3 100%);
+            -webkit-background-clip: text;
+          "
+          >Kategori Forum</span
+        >
+      </h2>
+      <p class="text-gray-600 max-w-2xl mx-auto">
+        Temukan topik diskusi yang sesuai dengan minat dan kebutuhan akademik
+        Anda
+      </p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      {% for category in categories %}
+      <div class="group">
+        <a
+          href="{% url 'thread_list_category' category.name|slugify %}"
+          class="block"
+        >
+          <div
+            class="bg-white rounded-2xl shadow-lg border border-gray-200 h-full transition-all duration-500 hover:shadow-xl hover:-translate-y-1 group-hover:scale-105"
+          >
+            <div class="p-6 text-center">
+              <div
+                class="mb-4 transition-all duration-500 group-hover:scale-110 group-hover:rotate-6"
+                style="color: {{ category.color }};"
+              >
+                {% if category.icon %}
+                <i class="{{ category.icon }} text-3xl"></i>
                 {% else %}
-                    <a href="{% url 'create_thread' %}" class="btn btn-light btn-lg">
-                        <i class="fas fa-plus me-2"></i>Buat Thread Baru
-                    </a>
+                <i class="fas fa-comments text-3xl"></i>
                 {% endif %}
+              </div>
+              <h5
+                class="text-lg font-bold text-gray-800 mb-2 group-hover:text-blue-700 transition-colors duration-300"
+                style="color: #5247a3"
+              >
+                {{ category.name }}
+              </h5>
+              <p class="text-gray-600 text-xs mb-3 leading-relaxed">
+                {{ category.description|truncatechars:60 }}
+              </p>
+              <div class="flex justify-center">
+                <span
+                  class="inline-flex items-center text-xs font-bold border rounded-full px-3 py-1 transition-all duration-300 bg-gray-50"
+                  style="color: #5247a3; border-color: #93d308"
+                >
+                  <i
+                    class="fas fa-fire mr-1 text-xs"
+                    style="color: #93d308"
+                  ></i>
+                  {{ category.thread_count }} diskusi
+                </span>
+              </div>
             </div>
-        </div>
+          </div>
+        </a>
+      </div>
+      {% endfor %}
     </div>
-    <div class="col-lg-4">
-        <div class="card">
-            <div class="card-header bg-light">
-                <h5 class="card-title mb-0"><i class="fas fa-chart-bar me-2"></i>Statistik Forum</h5>
+  </div>
+
+  <!-- Thread Populer -->
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+    <div class="lg:col-span-2">
+      <div class="flex justify-between items-center mb-6">
+        <h3
+          class="text-xl lg:text-2xl font-bold text-gray-800 flex items-center"
+        >
+          <div
+            class="rounded-full p-2 mr-3"
+            style="
+              background: linear-gradient(135deg, #93d308 0%, #a0e609 100%);
+            "
+          >
+            <i class="fas fa-fire text-white text-sm"></i>
+          </div>
+          <span
+            class="bg-clip-text text-transparent"
+            style="
+              background: linear-gradient(135deg, #93d308 0%, #a0e609 100%);
+              -webkit-background-clip: text;
+            "
+          >
+            Diskusi Trending
+          </span>
+        </h3>
+        <a
+          href="{% url 'thread_list' %}?sort=popular"
+          class="group text-white px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
+          style="background: linear-gradient(135deg, #5247a3 0%, #5247a3 100%)"
+        >
+          <i
+            class="fas fa-arrow-right mr-1 text-xs group-hover:translate-x-1 transition-transform duration-300"
+          ></i>
+          Lihat Semua
+        </a>
+      </div>
+
+      {% for thread in popular_threads|slice:':3' %}
+      <div
+        class="bg-white rounded-2xl shadow-lg border border-gray-200 mb-4 transition-all duration-300 hover:shadow-xl hover:-translate-y-0.5"
+      >
+        <div class="p-5">
+          <div class="flex">
+            <div class="flex-shrink-0 mr-4">
+              {% if thread.author.avatar %}
+              <img
+                src="{{ thread.author.avatar.url }}"
+                class="rounded-xl w-10 h-10 object-cover border-2"
+                alt="Avatar"
+                style="border-color: #5247a3"
+              />
+              {% else %}
+              <div
+                class="rounded-xl w-10 h-10 flex items-center justify-center border-2"
+                style="
+                  background: linear-gradient(135deg, #5247a3 0%, #5247a3 100%);
+                  border-color: #5247a3;
+                "
+              >
+                <i class="fas fa-user text-white text-sm"></i>
+              </div>
+              {% endif %}
             </div>
-            <div class="card-body">
-                <div class="row text-center">
-                    <div class="col-4">
-                        <div class="border-end">
-                            <h4 class="text-primary">{{ stats.total_threads|floatformat:0 }}</h4>
-                            <small class="text-muted">Thread</small>
-                        </div>
-                    </div>
-                    <div class="col-4">
-                        <div class="border-end">
-                            <h4 class="text-success">{{ stats.total_users|floatformat:0 }}</h4>
-                            <small class="text-muted">Pengguna</small>
-                        </div>
-                    </div>
-                    <div class="col-4">
-                        <h4 class="text-info">{{ stats.total_comments|floatformat:0 }}</h4>
-                        <small class="text-muted">Komentar</small>
-                    </div>
+            <div class="flex-grow">
+              <h5 class="text-lg font-bold mb-2">
+                <a
+                  href="{% url 'thread_detail' thread.pk %}"
+                  class="text-gray-800 transition-colors duration-300"
+                  style="color: #5247a3"
+                  onmouseover="this.style.color='#93d308'"
+                  onmouseout="this.style.color='#5247a3'"
+                >
+                  {{ thread.title }}
+                </a>
+                {% if thread.is_pinned %}
+                <i
+                  class="fas fa-thumbtack ml-2 text-sm"
+                  style="color: #93d308"
+                  title="Disematkan"
+                ></i>
+                {% endif %}
+              </h5>
+              <p class="text-gray-600 mb-4 leading-relaxed text-sm">
+                {{ thread.content|truncatechars:120 }}
+              </p>
+              {% if thread.image %}
+              <div class="mb-4">
+                <img
+                  src="{{ thread.image.url }}"
+                  alt="Thread Image"
+                  class="w-full h-52 object-cover rounded-xl border border-gray-200"
+                />
+              </div>
+              {% endif %}
+              <div class="flex flex-wrap justify-between items-center gap-3">
+                <div class="flex flex-wrap items-center gap-2">
+                  <span
+                    class="inline-flex items-center text-gray-700 px-3 py-1 rounded-full text-xs font-medium border bg-gray-50"
+                    style="border-color: #93d308"
+                  >
+                    <i class="fas fa-tag mr-1 text-gray-500 text-xs"></i>
+                    {{ thread.category.name }}
+                  </span>
+                  <div class="flex items-center">
+                    <span class="text-gray-500 text-xs">oleh</span>
+                    <strong class="text-gray-700 ml-1 mr-2 text-xs"
+                      >{{ thread.author.username }}</strong
+                    >
+                    <span
+                      class="inline-flex items-center text-xs font-bold border rounded-full px-2 py-1"
+                      style="
+                        background: linear-gradient(
+                          135deg,
+                          #5247a3 0%,
+                          #5247a3 100%
+                        );
+                        color: #fffcfb;
+                        border-color: #5247a3;
+                      "
+                    >
+                      <i class="fas fa-medal mr-1 text-xs"></i>
+                      {{ thread.author.get_badge.name }}
+                    </span>
+                  </div>
                 </div>
+                <div class="flex items-center gap-4 text-gray-500">
+                  <span class="flex items-center text-xs font-medium">
+                    <i
+                      class="fas fa-eye mr-1 text-xs"
+                      style="color: #5247a3"
+                    ></i>
+                    {{ thread.views }}
+                  </span>
+                  <span class="flex items-center text-xs font-medium">
+                    <i
+                      class="fas fa-comments mr-1 text-xs"
+                      style="color: #93d308"
+                    ></i>
+                    {{ thread.comment_count }}
+                  </span>
+                </div>
+              </div>
             </div>
+          </div>
         </div>
+      </div>
+      {% empty %}
+      <div class="text-center py-12">
+        <div
+          class="bg-gradient-to-br from-gray-100 to-gray-200 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4"
+        >
+          <i class="fas fa-comments text-3xl text-gray-400"></i>
+        </div>
+        <p class="text-gray-500 text-lg font-medium">
+          Belum ada diskusi trending
+        </p>
+        <p class="text-gray-400 text-sm mt-1">
+          Jadilah yang pertama memulai diskusi menarik!
+        </p>
+      </div>
+      {% endfor %}
     </div>
+
+    <div class="lg:col-span-1 space-y-6">
+      <!-- Activity Feed -->
+      <div
+        class="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden"
+      >
+        <div
+          class="px-4 py-3"
+          style="background: linear-gradient(135deg, #5247a3 0%, #5247a3 100%)"
+        >
+          <h5 class="text-base font-bold text-white flex items-center">
+            <i class="fas fa-clock mr-2 text-sm" style="color: #ffd8d8"></i
+            >Thread Terbaru
+          </h5>
+        </div>
+        <div class="p-4">
+          {% for thread in recent_threads|slice:":5" %}
+          <div
+            class="flex mb-4 {% if not forloop.last %}border-b border-gray-100 pb-4{% endif %}"
+          >
+            <div class="flex-shrink-0 mr-3">
+              {% if thread.author.avatar %}
+              <img
+                src="{{ thread.author.avatar.url }}"
+                class="rounded-xl w-8 h-8 object-cover border-2"
+                alt="Avatar"
+                style="border-color: #5247a3"
+              />
+              {% else %}
+              <div
+                class="rounded-xl w-8 h-8 flex items-center justify-center border-2"
+                style="
+                  background: linear-gradient(135deg, #5247a3 0%, #5247a3 100%);
+                  border-color: #5247a3;
+                "
+              >
+                <i class="fas fa-user text-white text-xs"></i>
+              </div>
+              {% endif %}
+            </div>
+            <div class="flex-grow">
+              <h6 class="text-xs font-bold mb-1">
+                <a
+                  href="{% url 'thread_detail' thread.pk %}"
+                  class="text-gray-800 transition-colors duration-300 line-clamp-2"
+                  style="color: #5247a3"
+                  onmouseover="this.style.color='#93d308'"
+                  onmouseout="this.style.color='#5247a3'"
+                >
+                  {{ thread.title|truncatechars:35 }}
+                </a>
+              </h6>
+              <div class="flex items-center text-xs text-gray-500">
+                <span class="font-medium text-gray-700"
+                  >{{ thread.author.username }}</span
+                >
+                <span class="mx-1">•</span>
+                <span>{{ thread.created_at|naturaltime }}</span>
+              </div>
+            </div>
+          </div>
+          {% empty %}
+          <div class="text-center py-6">
+            <div
+              class="bg-gradient-to-br from-gray-100 to-gray-200 rounded-full w-12 h-12 flex items-center justify-center mx-auto mb-3"
+            >
+              <i class="fas fa-clock text-xl text-gray-400"></i>
+            </div>
+            <p class="text-gray-500 font-medium text-sm">Belum ada Thread</p>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- Quick Actions -->
+      {% if user.is_authenticated %}
+      <div
+        class="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden"
+      >
+        <div
+          class="px-4 py-3"
+          style="background: linear-gradient(135deg, #5247a3 0%, #5247a3 100%)"
+        >
+          <h5 class="text-base font-bold text-white flex items-center">
+            <i class="fas fa-bolt mr-2 text-sm" style="color: #ffd8d8"></i>Aksi
+            Cepat
+          </h5>
+        </div>
+        <div class="p-4">
+          <div class="space-y-3">
+            <a
+              href="{% url 'create_thread' %}"
+              class="group block w-full text-white text-center py-3 rounded-xl font-semibold transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-0.5 text-sm"
+              style="
+                background: linear-gradient(135deg, #93d308 0%, #a0e609 100%);
+              "
+            >
+              <i
+                class="fas fa-plus mr-2 text-xs group-hover:scale-110 transition-transform duration-300"
+              ></i>
+              Buat Diskusi
+            </a>
+            <a
+              href="{% url 'dashboard' %}"
+              class="group block w-full bg-white border-2 text-center py-3 rounded-xl font-semibold transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-0.5 text-sm"
+              style="border-color: #5247a3; color: #5247a3"
+              onmouseover="this.style.background='rgba(9, 63, 180, 0.1)'"
+              onmouseout="this.style.background='white'"
+            >
+              <i
+                class="fas fa-tachometer-alt mr-2 text-xs group-hover:scale-110 transition-transform duration-300"
+              ></i>
+              Dashboard
+            </a>
+            <a
+              href="{% url 'search' %}"
+              class="group block w-full bg-white border-2 border-gray-300 text-gray-700 text-center py-3 rounded-xl font-semibold hover:bg-gray-50 hover:border-gray-400 transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-0.5 text-sm"
+            >
+              <i
+                class="fas fa-search mr-2 text-xs group-hover:scale-110 transition-transform duration-300"
+              ></i>
+              Cari Diskusi
+            </a>
+          </div>
+        </div>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+  {% endblock %}
 </div>
-
-<!-- Kategori Forum -->
-<div class="row mb-5">
-    <div class="col-12">
-        <h2 class="mb-4"><i class="fas fa-folder me-2"></i>Kategori Forum</h2>
-        <div class="row g-3">
-            {% for category in categories %}
-                <div class="col-md-6 col-lg-4">
-                    <a href="{% url 'thread_list_category' category.name|slugify %}" class="text-decoration-none">
-                        <div class="card h-100 category-card">
-                            <div class="card-body text-center">
-                                <div class="category-icon mb-3" style="color: {{ category.color }};">
-                                    {% if category.icon %}
-                                        <i class="{{ category.icon }} fa-2x"></i>
-                                    {% else %}
-                                        <i class="fas fa-comments fa-2x"></i>
-                                    {% endif %}
-                                </div>
-                                <h5 class="card-title">{{ category.name }}</h5>
-                                <p class="card-text text-muted small">{{ category.description|truncatechars:80 }}</p>
-                                <span class="badge bg-primary">{{ category.thread_count }} thread</span>
-                            </div>
-                        </div>
-                    </a>
-                </div>
-            {% endfor %}
-        </div>
-    </div>
-</div>
-
-<!-- Thread Populer -->
-<div class="row mb-5">
-    <div class="col-lg-8">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-            <h3><i class="fas fa-fire text-danger me-2"></i>Thread Populer</h3>
-            <a href="{% url 'thread_list' %}?sort=popular" class="btn btn-outline-primary btn-sm">Lihat Semua</a>
-        </div>
-        {% for thread in popular_threads %}
-            <div class="card mb-3 thread-card">
-                <div class="card-body">
-                    <div class="d-flex">
-                        <div class="flex-shrink-0 me-3">
-                            {% if thread.author.avatar %}
-                                <img src="{{ thread.author.avatar.url }}" class="rounded-circle" width="40" height="40" alt="Avatar">
-                            {% else %}
-                                <div class="bg-secondary rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
-                                    <i class="fas fa-user text-white"></i>
-                                </div>
-                            {% endif %}
-                        </div>
-                        <div class="flex-grow-1">
-                            <h5 class="card-title mb-2">
-                                <a href="{% url 'thread_detail' thread.pk %}" class="text-decoration-none">{{ thread.title }}</a>
-                                {% if thread.is_pinned %}
-                                    <i class="fas fa-thumbtack text-warning ms-1" title="Disematkan"></i>
-                                {% endif %}
-                            </h5>
-                            <p class="card-text text-muted">{{ thread.content|truncatechars:150 }}</p>
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div class="thread-meta">
-                                    <span class="badge bg-light text-dark me-2">{{ thread.category.name }}</span>
-                                    <small class="text-muted">
-                                        oleh <strong>{{ thread.author.username }}</strong>
-                                        <span class="badge {{ thread.author.get_badge.class }} ms-1">{{ thread.author.get_badge.name }}</span>
-                                    </small>
-                                </div>
-                                <div class="thread-stats">
-                                    <small class="text-muted me-3">
-                                        <i class="fas fa-eye me-1"></i>{{ thread.views }}
-                                    </small>
-                                    <small class="text-muted">
-                                        <i class="fas fa-comments me-1"></i>{{ thread.comment_count }}
-                                    </small>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        {% empty %}
-            <div class="text-center py-5">
-                <i class="fas fa-comments fa-3x text-muted mb-3"></i>
-                <p class="text-muted">Belum ada thread populer</p>
-            </div>
-        {% endfor %}
-    </div>
-    
-    <div class="col-lg-4">
-        <!-- Thread Terbaru -->
-        <div class="card">
-            <div class="card-header bg-light">
-                <h5 class="card-title mb-0"><i class="fas fa-clock me-2"></i>Activity Feed</h5>
-            </div>
-            <div class="card-body">
-                {% for thread in recent_threads|slice:":5" %}
-                    <div class="d-flex mb-3 {% if not forloop.last %}border-bottom pb-3{% endif %}">
-                        <div class="flex-shrink-0 me-3">
-                            {% if thread.author.avatar %}
-                                <img src="{{ thread.author.avatar.url }}" class="rounded-circle" width="32" height="32" alt="Avatar">
-                            {% else %}
-                                <div class="bg-secondary rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
-                                    <i class="fas fa-user text-white" style="font-size: 12px;"></i>
-                                </div>
-                            {% endif %}
-                        </div>
-                        <div class="flex-grow-1">
-                            <h6 class="mb-1">
-                                <a href="{% url 'thread_detail' thread.pk %}" class="text-decoration-none">{{ thread.title|truncatechars:40 }}</a>
-                            </h6>
-                            <small class="text-muted">
-                                {{ thread.author.username }} • {{ thread.created_at|naturaltime }}
-                            </small>
-                        </div>
-                    </div>
-                {% empty %}
-                    <p class="text-muted text-center">Belum ada aktivitas</p>
-                {% endfor %}
-            </div>
-        </div>
-        
-        <!-- Quick Actions -->
-        {% if user.is_authenticated %}
-            <div class="card mt-4">
-                <div class="card-header bg-light">
-                    <h5 class="card-title mb-0"><i class="fas fa-bolt me-2"></i>Quick Actions</h5>
-                </div>
-                <div class="card-body">
-                    <div class="d-grid gap-2">
-                        <a href="{% url 'create_thread' %}" class="btn btn-primary">
-                            <i class="fas fa-plus me-2"></i>Buat Thread
-                        </a>
-                        <a href="{% url 'dashboard' %}" class="btn btn-outline-primary">
-                            <i class="fas fa-tachometer-alt me-2"></i>Dashboard
-                        </a>
-                        <a href="{% url 'search' %}" class="btn btn-outline-secondary">
-                            <i class="fas fa-search me-2"></i>Cari Diskusi
-                        </a>
-                    </div>
-                </div>
-            </div>
-        {% endif %}
-    </div>
-</div>
-
-<style>
-.category-card {
-    transition: all 0.3s ease;
-    border: 1px solid #dee2e6;
-}
-
-.category-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
-    border-color: var(--bs-primary);
-}
-
-.thread-card {
-    transition: all 0.2s ease;
-}
-
-.thread-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-}
-
-.category-icon {
-    transition: all 0.3s ease;
-}
-
-.category-card:hover .category-icon {
-    transform: scale(1.1);
-}
-</style>
-{% endblock %}

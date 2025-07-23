@@ -3,6 +3,10 @@ from django.utils.deprecation import MiddlewareMixin
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.contrib import messages
+from django.utils import timezone
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
 
 class AdminUserMiddleware(MiddlewareMixin):
     def process_request(self, request):
@@ -50,6 +54,33 @@ class SessionSeparationMiddleware(MiddlewareMixin):
             # Gunakan session key yang berbeda untuk admin
             original_session_key = request.session.session_key
             if original_session_key:
-                request.session['session_key'] =  f"admin_{original_session_key}"
+                request.session['session_key'] = f"admin_{original_session_key}"
+        
+        return None
+
+class UserActivityMiddleware(MiddlewareMixin):
+    """
+    Middleware untuk melacak aktivitas user terakhir kali
+    """
+    
+    def process_request(self, request):
+        # Hanya update untuk user yang sudah login dan bukan admin request
+        if (request.user.is_authenticated and 
+            not request.path.startswith('/admin/') and
+            not request.path.startswith('/static/') and
+            not request.path.startswith('/media/')):
+            
+            # Cek apakah user adalah User model kita
+            if hasattr(request.user, 'last_activity'):
+                # Update last_activity setiap 5 menit untuk mengurangi database hits
+                now = timezone.now()
+                if (not hasattr(request.user, 'last_activity') or 
+                    not request.user.last_activity or
+                    (now - request.user.last_activity).total_seconds() > 300):  # 5 menit
+                    
+                    # Update last_activity tanpa memicu signal
+                    User.objects.filter(pk=request.user.pk).update(
+                        last_activity=now
+                    )
         
         return None

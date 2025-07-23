@@ -1,30 +1,232 @@
-    <footer class="bg-dark text-light py-4 mt-5">
-        <div class="container">
-            <div class="row">
-                <div class="col-md-6">
-                    <h5><i class="fas fa-graduation-cap me-2"></i>AgoraTalk</h5>
-                    <p class="text-muted">Platform diskusi untuk mahasiswa Indonesia</p>
-                </div>
-                <div class="col-md-3">
-                    <h6>Quick Links</h6>
-                    <ul class="list-unstyled">
-                        <li><a href="{% url 'home' %}" class="text-light text-decoration-none">Beranda</a></li>
-                        <li><a href="{% url 'thread_list' %}" class="text-light text-decoration-none">Diskusi</a></li>
-                        <li><a href="{% url 'search' %}" class="text-light text-decoration-none">Pencarian</a></li>
-                    </ul>
-                </div>
-                <div class="col-md-3">
-                    <h6>Bantuan</h6>
-                    <ul class="list-unstyled">
-                        <li><a href="#" class="text-light text-decoration-none">FAQ</a></li>
-                        <li><a href="#" class="text-light text-decoration-none">Kontak</a></li>
-                        <li><a href="#" class="text-light text-decoration-none">Kebijakan</a></li>
-                    </ul>
-                </div>
-            </div>
-            <hr class="my-3">
-            <div class="text-center">
-                <p class="mb-0">&copy; 2025 AgoraTalk. All rights reserved.</p>
-            </div>
+<footer
+  class="bg-gradient-to-br from-gray-50 to-gray-100 border-t border-gray-200 mt-auto"
+>
+  <div class="max-w-7xl mx-auto px-6 lg:px-8 py-8">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8">
+      <!-- Brand Section -->
+      <div class="lg:col-span-2">
+        <div class="mb-4">
+          <h5 class="text-indigo-600 font-bold text-lg mb-3">
+            <i class="fas fa-comments mr-2"></i>AgoraTalk
+          </h5>
+          <p class="text-gray-600 mb-4 leading-relaxed">
+            Platform diskusi komunitas mahasiswa Indonesia untuk berbagi
+            pengetahuan dan pengalaman.
+          </p>
+          <div class="flex space-x-4">
+            <a
+              href="#"
+              class="text-gray-500 hover:text-indigo-600 transform hover:scale-110 transition-all duration-300"
+              title="Facebook"
+            >
+              <i class="fab fa-facebook-f text-lg"></i>
+            </a>
+            <a
+              href="#"
+              class="text-gray-500 hover:text-indigo-600 transform hover:scale-110 transition-all duration-300"
+              title="Twitter"
+            >
+              <i class="fab fa-twitter text-lg"></i>
+            </a>
+            <a
+              href="#"
+              class="text-gray-500 hover:text-indigo-600 transform hover:scale-110 transition-all duration-300"
+              title="Instagram"
+            >
+              <i class="fab fa-instagram text-lg"></i>
+            </a>
+            <a
+              href="#"
+              class="text-gray-500 hover:text-indigo-600 transform hover:scale-110 transition-all duration-300"
+              title="LinkedIn"
+            >
+              <i class="fab fa-linkedin-in text-lg"></i>
+            </a>
+          </div>
         </div>
-    </footer>
+      </div>
+
+      <!-- Quick Links -->
+      <div>
+        <h6
+          class="text-gray-800 font-semibold text-sm uppercase tracking-wider mb-4"
+        >
+          Navigasi
+        </h6>
+        <ul class="space-y-3">
+          <li>
+            <a
+              href="{% url 'home' %}"
+              class="text-gray-600 hover:text-indigo-600 text-sm flex items-center transform hover:translate-x-1 transition-all duration-200"
+            >
+              <i class="fas fa-home mr-2 text-xs"></i>Beranda
+            </a>
+          </li>
+          <li>
+            <a
+              href="{% url 'thread_list' %}"
+              class="text-gray-600 hover:text-indigo-600 text-sm flex items-center transform hover:translate-x-1 transition-all duration-200"
+            >
+              <i class="fas fa-comments mr-2 text-xs"></i>Forum
+            </a>
+          </li>
+          <li>
+            <a
+              href="{% url 'search' %}"
+              class="text-gray-600 hover:text-indigo-600 text-sm flex items-center transform hover:translate-x-1 transition-all duration-200"
+            >
+              <i class="fas fa-search mr-2 text-xs"></i>Pencarian
+            </a>
+          </li>
+          <li>
+            <a
+              href="{% url 'create_thread' %}"
+              class="text-gray-600 hover:text-indigo-600 text-sm flex items-center transform hover:translate-x-1 transition-all duration-200"
+            >
+              <i class="fas fa-plus mr-2 text-xs"></i>Buat Thread
+            </a>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Community -->
+      <div>
+        <h6
+          class="text-gray-800 font-semibold text-sm uppercase tracking-wider mb-4"
+        >
+          Komunitas
+        </h6>
+        <ul class="space-y-3">
+          <li>
+            <a
+              href="#"
+              class="text-gray-600 hover:text-indigo-600 text-sm flex items-center transform hover:translate-x-1 transition-all duration-200"
+            >
+              <i class="fas fa-users mr-2 text-xs"></i>Tentang Kami
+            </a>
+          </li>
+          <li>
+            <a
+              href="#"
+              class="text-gray-600 hover:text-indigo-600 text-sm flex items-center transform hover:translate-x-1 transition-all duration-200"
+            >
+              <i class="fas fa-handshake mr-2 text-xs"></i>Kemitraan
+            </a>
+          </li>
+          <li>
+            <a
+              href="#"
+              class="text-gray-600 hover:text-indigo-600 text-sm flex items-center transform hover:translate-x-1 transition-all duration-200"
+            >
+              <i class="fas fa-bullhorn mr-2 text-xs"></i>Event
+            </a>
+          </li>
+          <li>
+            <a
+              href="#"
+              class="text-gray-600 hover:text-indigo-600 text-sm flex items-center transform hover:translate-x-1 transition-all duration-200"
+            >
+              <i class="fas fa-newspaper mr-2 text-xs"></i>Blog
+            </a>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Support -->
+      <div>
+        <h6
+          class="text-gray-800 font-semibold text-sm uppercase tracking-wider mb-4"
+        >
+          Bantuan
+        </h6>
+        <ul class="space-y-3">
+          <li>
+            <a
+              href="#"
+              class="text-gray-600 hover:text-indigo-600 text-sm flex items-center transform hover:translate-x-1 transition-all duration-200"
+            >
+              <i class="fas fa-question-circle mr-2 text-xs"></i>FAQ
+            </a>
+          </li>
+          <li>
+            <a
+              href="#"
+              class="text-gray-600 hover:text-indigo-600 text-sm flex items-center transform hover:translate-x-1 transition-all duration-200"
+            >
+              <i class="fas fa-envelope mr-2 text-xs"></i>Kontak
+            </a>
+          </li>
+          <li>
+            <a
+              href="#"
+              class="text-gray-600 hover:text-indigo-600 text-sm flex items-center transform hover:translate-x-1 transition-all duration-200"
+            >
+              <i class="fas fa-shield-alt mr-2 text-xs"></i>Kebijakan
+            </a>
+          </li>
+          <li>
+            <a
+              href="#"
+              class="text-gray-600 hover:text-indigo-600 text-sm flex items-center transform hover:translate-x-1 transition-all duration-200"
+            >
+              <i class="fas fa-file-contract mr-2 text-xs"></i>Syarat &
+              Ketentuan
+            </a>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Contact Info -->
+      <div>
+        <h6
+          class="text-gray-800 font-semibold text-sm uppercase tracking-wider mb-4"
+        >
+          Kontak
+        </h6>
+        <div class="space-y-3 text-sm">
+          <div class="flex items-center">
+            <i class="fas fa-envelope mr-3 text-indigo-600 text-xs"></i>
+            <span class="text-gray-600">info@agoratalk.id</span>
+          </div>
+          <div class="flex items-center">
+            <i class="fas fa-phone mr-3 text-indigo-600 text-xs"></i>
+            <span class="text-gray-600">+62 21 1234 5678</span>
+          </div>
+          <div class="flex items-center">
+            <i class="fas fa-map-marker-alt mr-3 text-indigo-600 text-xs"></i>
+            <span class="text-gray-600">Jakarta, Indonesia</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom Section -->
+    <div class="border-t border-gray-200 mt-8 pt-6">
+      <div class="flex flex-col md:flex-row items-center justify-between">
+        <div class="mb-4 md:mb-0">
+          <p class="text-gray-600 text-sm">
+            &copy; 2025 <strong class="text-indigo-600">AgoraTalk</strong>. All
+            rights reserved.
+          </p>
+        </div>
+        <div class="flex space-x-6">
+          <a
+            href="#"
+            class="text-gray-600 hover:text-indigo-600 text-sm transition-colors duration-200"
+            >Privacy Policy</a
+          >
+          <a
+            href="#"
+            class="text-gray-600 hover:text-indigo-600 text-sm transition-colors duration-200"
+            >Terms of Service</a
+          >
+          <a
+            href="#"
+            class="text-gray-600 hover:text-indigo-600 text-sm transition-colors duration-200"
+            >Cookies</a
+          >
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>

@@ -43,45 +43,104 @@ INSTALLED_APPS = [
 
 # Jazzmin admin customization
 JAZZMIN_SETTINGS = {
-    "site_logo": "images/logo.png",
-    "site_icon": "images/favicon.ico",
-    "site_title": "Portal Forum Mahasiswa",
-    "site_header": "Admin Forum Kampus",
-    "site_brand": "ForumKampus",
-    "welcome_sign": "Selamat datang di Panel Admin Forum Kampus!",
-    "copyright": "Universitas Muhammadiyah",
-    "search_model": "forum.Thread",
-
-    # Menu customization
+    # Header & Branding
+    "site_title": "AgoraTalk",
+    "site_header": "Admin AgoraTa",
+    "site_brand": "AgoraTalk",
+    # "site_logo": "images/logo.png",
+    "site_icon": "images/logo_agora",
+    "welcome_sign": "Selamat datang di Panel Admin AgoraTalk",
+    "copyright": "AgoraTalk",
+    
+    # Search
+    "search_model": ["forum.Thread", "forum.User"],
+    
+    # Navigation
     "topmenu_links": [
-        {"name": "Beranda", "url": "/", "permissions": ["auth.view_user"]},
+        {"name": "Lihat Site", "url": "/", "permissions": ["auth.view_user"], "new_window": True},
+        {"name": "Dashboard", "url": "admin:index", "permissions": ["auth.view_user"]},
         {"model": "forum.Thread"},
-        {"model": "forum.Comment"},
-        {"model": "forum.Category"},
+        {"model": "forum.Report"},
     ],
-
+    
+    # Sidebar
     "show_sidebar": True,
     "navigation_expanded": True,
-
-    # Theme
-    "theme": "darkly",
+    "hide_apps": [],
+    "hide_models": [],
     
-    # Icons
+    # UI Configuration
+    "order_with_respect_to": ["forum", "auth"],
+    "show_ui_builder": False,
+    
+    # Theme & Layout
+    "theme": "flatly",  # Professional and clean theme
+    "dark_mode_theme": "darkly",
+    
+
+    
+    # Icons (Font Awesome)
     "icons": {
         "auth": "fas fa-users-cog",
         "auth.user": "fas fa-user",
         "auth.Group": "fas fa-users",
+        "forum.User": "fas fa-user-graduate",
         "forum.Thread": "fas fa-comments",
-        "forum.Comment": "fas fa-comment",
-        "forum.Category": "fas fa-folder",
+        "forum.Comment": "fas fa-comment-alt",
+        "forum.Category": "fas fa-folder-open",
         "forum.Vote": "fas fa-thumbs-up",
         "forum.Bookmark": "fas fa-bookmark",
         "forum.Notification": "fas fa-bell",
+        "forum.Report": "fas fa-flag",
     },
     
-    # Custom styling
-    "custom_css": "admin/custom.css",
-    "custom_js": "admin/custom.js",
+    # Related modal
+    "related_modal_active": False,
+    
+    # UI Tweaks
+    "changeform_format": "horizontal_tabs",
+    "changeform_format_overrides": {
+        "forum.user": "collapsible",
+        "forum.thread": "horizontal_tabs"
+    },
+    
+    # Language
+    "language_chooser": False,
+
+}
+
+
+JAZZMIN_UI_TWEAKS = {
+    "navbar_small_text": False,
+    "footer_small_text": False,
+    "body_small_text": False,
+    "brand_small_text": False,
+    "brand_colour": "navbar-primary",
+    "accent": "accent-primary",
+    "navbar": "navbar-dark",
+    "no_navbar_border": False,
+    "navbar_fixed": False,
+    "layout_boxed": False,
+    "footer_fixed": False,
+    "sidebar_fixed": True,
+    "sidebar": "sidebar-dark-primary",
+    "sidebar_nav_small_text": False,
+    "sidebar_disable_expand": False,
+    "sidebar_nav_child_indent": False,
+    "sidebar_nav_compact_style": False,
+    "sidebar_nav_legacy_style": False,
+    "sidebar_nav_flat_style": False,
+    "theme": "default",
+    "dark_mode_theme": None,
+    "button_classes": {
+        "primary": "btn-primary",
+        "secondary": "btn-secondary",
+        "info": "btn-info",
+        "warning": "btn-warning",
+        "danger": "btn-danger",
+        "success": "btn-success"
+    },
+    "actions_sticky_top": False
 }
 
 MIDDLEWARE = [
@@ -90,10 +149,10 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'forum.middleware.AdminUserMiddleware',
-    'forum.middleware.SessionSeparationMiddleware',
+    'forum.middleware.UserActivityMiddleware',  # Tambahkan ini
+    # 'forum.middleware.SessionSeparationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',   
 ]
 
 ROOT_URLCONF = 'config.urls'
@@ -176,17 +235,6 @@ ADMIN_SITE_HEADER = 'Portal Forum Mahasiswa'
 ADMIN_SITE_TITLE = 'Forum Admin'
 ADMIN_INDEX_TITLE = 'Dashboard Administrasi'
 
-# Chart.js untuk analytics (tambahkan ke JAZZMIN_SETTINGS)
-JAZZMIN_SETTINGS.update({
-    "custom_links": {
-        "forum": [{
-            "name": "Analytics Dashboard",
-            "url": "admin:analytics",
-            "icon": "fas fa-chart-bar",
-            "permissions": ["forum.view_thread"]
-        }]
-    }
-})
 
 # Login/Logout redirects
 LOGIN_URL = '/login/'
@@ -202,15 +250,8 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
-    },
-    'admin_db': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'admin_db.sqlite3',
     }
 }
-
-# Database router
-DATABASE_ROUTERS = ['forum.database_router.DatabaseRouter']
 
 # Custom User Model
 AUTH_USER_MODEL = 'forum.User'
@@ -224,7 +265,8 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'fikriganteng238@gmail.com'  # Ganti dengan email Anda
 EMAIL_HOST_PASSWORD = 'cwju ziol isip srez'  # Ganti dengan App Password Gmail
-DEFAULT_FROM_EMAIL = 'Forum Kampus <fikriganteng238@gmail.com>'
+DEFAULT_FROM_EMAIL = 'AgoraTalk <fikriganteng238@gmail.com>'
+
 
 # Alternative: Console Backend for Development/Testing
 # EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'

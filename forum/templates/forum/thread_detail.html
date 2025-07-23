@@ -1,164 +1,1114 @@
-{% extends 'forum/base.html' %}
-{% load humanize %}
+{% extends 'forum/base.html' %} {% load humanize %} {% block content %}
+<style>
+  /* Dropdown animations */
+  ul[id$="Dropdown"] {
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: all 0.2s ease-out;
+  }
 
-{% block content %}
-<div class="container mt-4">
-    <!-- Thread Header -->
-    <div class="card mb-4">
-        <div class="card-body">
-            <h2 class="card-title">{{ thread.title }}</h2>
-            <div class="d-flex justify-content-between align-items-center text-muted mb-3">
-                <div>
-                    <small>
-                        <i class="fas fa-user"></i> {{ thread.author.username }}
-                        <i class="fas fa-clock ms-2"></i> {{ thread.created_at|naturaltime }}
-                        <i class="fas fa-eye ms-2"></i> {{ thread.views }} views
-                    </small>
-                </div>
+  ul[id$="Dropdown"]:not(.hidden) {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* Hover effects for dropdown items */
+  ul[id$="Dropdown"] button:hover {
+    transform: translateX(2px);
+  }
+
+  /* Edit Modal Enhancements */
+  #editModal .overflow-y-auto {
+    scrollbar-width: thin;
+    scrollbar-color: #cbd5e1 #f1f5f9;
+  }
+
+  #editModal .overflow-y-auto::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  #editModal .overflow-y-auto::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 3px;
+  }
+
+  #editModal .overflow-y-auto::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 3px;
+  }
+
+  #editModal .overflow-y-auto::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+  }
+
+  /* Image preview hover effect */
+  #editModal img {
+    transition: transform 0.2s ease;
+  }
+
+  #editModal img:hover {
+    transform: scale(1.05);
+  }
+
+  /* Form focus enhancement */
+  #editModal input:focus,
+  #editModal textarea:focus {
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  }
+</style>
+<!-- Page Header Banner (match thread_list style) -->
+<div class="max-w-7xl mx-auto px-6 sm:px-8 lg:px-10">
+  <div class="mb-8">
+    <div
+      class="relative text-white rounded-xl overflow-hidden"
+      style="
+        background-blend-mode: overlay;
+        background-color: rgba(9, 63, 180, 0.7);
+      "
+    >
+      <!-- Gradient Overlay Layer (matching navbar gradient) -->
+      <div
+        class="absolute inset-0"
+        style="
+          background: linear-gradient(90deg, #b12ad5 0%, #5247a3 50%, #60cac5 100%);
+          opacity: 0.85;
+        "
+      ></div>
+
+      <!-- Background Pattern -->
+      <div class="absolute inset-0 opacity-10">
+        <svg class="w-full h-full" viewBox="0 0 15 30" fill="none">
+          <defs>
+            <pattern
+              id="grid-forum"
+              width="5"
+              height="5"
+              patternUnits="userSpaceOnUse"
+            >
+              <circle cx="2.0" cy="2.0" r="0.5" fill="currentColor" />
+            </pattern>
+          </defs>
+          <rect width="100" height="100" fill="url(#grid-forum)" />
+        </svg>
+      </div>
+
+      <!-- Content -->
+      <div class="relative p-6 lg:p-8">
+        <div
+          class="flex flex-col lg:flex-row justify-between items-start lg:items-center"
+        >
+          <div class="flex items-center mb-4 lg:mb-0 flex-1">
+            <div class="bg-white/20 backdrop-blur-sm rounded-full p-3 mr-3">
+              <i class="fas fa-file-alt text-xl text-white"></i>
+            </div>
+            <div class="flex-1 min-w-0">
+              <h1
+                class="text-2xl lg:text-3xl font-bold leading-tight mb-2 break-words"
+              >
+                {{ thread.title }}
+              </h1>
+              <div
+                class="flex flex-wrap items-center gap-4 text-cyan-100 text-sm"
+              >
+                <span class="flex items-center">
+                  <i class="fas fa-user mr-1 text-cyan-300"></i>
+                  <a
+                    href="{% url 'profile_detail' thread.author.username %}"
+                    class="hover:text-white transition-colors"
+                  >
+                    {{ thread.author.username }}
+                  </a>
+                </span>
+                <span class="flex items-center">
+                  <i class="fas fa-clock mr-1 text-cyan-300"></i>
+                  {{ thread.created_at|naturaltime }}
+                </span>
+                <span class="flex items-center">
+                  <i class="fas fa-eye mr-1 text-cyan-300"></i>
+                  {{ thread.views }} views
+                </span>
                 {% if thread.category %}
-                    <span class="badge bg-primary">{{ thread.category.name }}</span>
+                <span
+                  class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-white/20 backdrop-blur-sm"
+                >
+                  {% if thread.category.icon %}
+                  <i class="{{ thread.category.icon }} mr-1"></i>
+                  {% endif %} {{ thread.category.name }}
+                </span>
                 {% endif %}
+              </div>
             </div>
-            
-            <!-- Thread Content -->
-            <div class="thread-content">
-                {{ thread.content|linebreaks }}
-            </div>
-            
-            <!-- Thread Tags -->
-            {% if thread.tags %}
-                <div class="mt-3">
-                    {% for tag in thread.tags_list %}
-                        <span class="badge bg-secondary me-1">#{{ tag }}</span>
-                    {% endfor %}
-                </div>
-            {% endif %}
-            
-            <!-- Bookmark Button -->
-            {% if user.is_authenticated %}
-                <div class="mt-3">
-                    <form method="post" action="{% url 'toggle_bookmark' thread.pk %}" class="d-inline">
-                        {% csrf_token %}
-                        <button type="submit" class="btn btn-sm btn-outline-warning">
-                            <i class="fas fa-bookmark"></i>
-                            {% if is_bookmarked %}Hapus Bookmark{% else %}Bookmark{% endif %}
-                        </button>
-                    </form>
-                </div>
-            {% endif %}
+          </div>
+
+          {% if user.is_authenticated and thread.author == user or user.is_admin_user %}
+          <div class="relative mt-4 lg:mt-0">
+            <button
+              onclick="toggleDropdown('threadDropdown')"
+              class="bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white border border-white/30 px-4 py-2 rounded-xl font-medium transition-all duration-300 flex items-center"
+            >
+              <i class="fas fa-ellipsis-v mr-2"></i>Kelola
+            </button>
+            <ul
+              id="threadDropdown"
+              class="absolute right-0 top-full mt-2 bg-white rounded-xl shadow-lg border border-gray-200 py-2 min-w-max z-10 hidden"
+            >
+              <li>
+                <button
+                  onclick="editThread()"
+                  class="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-50 transition-colors duration-300 flex items-center gap-2"
+                >
+                  <i class="fas fa-edit text-blue-600"></i> Edit Thread
+                </button>
+              </li>
+              <li>
+                <button
+                  onclick="deleteThread()"
+                  class="w-full text-left px-4 py-2 text-red-600 hover:bg-red-50 transition-colors duration-300 flex items-center gap-2"
+                >
+                  <i class="fas fa-trash"></i> Hapus Thread
+                </button>
+              </li>
+            </ul>
+          </div>
+          {% endif %}
         </div>
+
+        <!-- Thread Stats -->
+        <div class="flex flex-wrap items-center gap-4 text-cyan-100 mt-4">
+          <div class="flex items-center">
+            <i class="fas fa-comments mr-2 text-cyan-300 text-sm"></i>
+            <span class="text-xs font-medium"
+              >{{ comments.count }} Komentar</span
+            >
+          </div>
+          {% if thread.image %}
+          <div class="flex items-center">
+            <i class="fas fa-image mr-2 text-cyan-300 text-sm"></i>
+            <span class="text-xs font-medium">Ada Gambar</span>
+          </div>
+          {% endif %}
+          {% if thread.is_pinned %}
+          <div class="flex items-center">
+            <i class="fas fa-thumbtack mr-2 text-cyan-300 text-sm"></i>
+            <span class="text-xs font-medium">Disematkan</span>
+          </div>
+          {% endif %}
+          {% if thread.is_locked %}
+          <div class="flex items-center">
+            <i class="fas fa-lock mr-2 text-cyan-300 text-sm"></i>
+            <span class="text-xs font-medium">Dikunci</span>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Thread Content -->
+  <div
+    class="bg-white rounded-2xl shadow-md border border-gray-100 overflow-hidden mb-6"
+  >
+    <div class="p-6">
+      <!-- Content -->
+      <div class="prose max-w-none mb-6">{{ thread.content|linebreaks }}</div>
+
+      <!-- Image -->
+      {% if thread.image %}
+      <div class="mb-6 text-center">
+        <img
+          src="{{ thread.image.url }}"
+          alt="Thread Image"
+          class="max-h-96 max-w-full object-contain rounded-xl border border-gray-200 cursor-pointer "
+          onclick="openImageModal('{{ thread.image.url }}')"
+        />
+      </div>
+      {% endif %}
+
+      <!-- Tags -->
+      {% if thread.tags %}
+      <div class="flex flex-wrap gap-2 mb-6">
+        {% for tag in thread.tags_list %}
+        <span
+          class="bg-gray-100 hover:bg-cyan-500 hover:text-white text-gray-700 px-3 py-1 rounded-full text-sm font-medium transition-all cursor-pointer"
+        >
+          #{{ tag }}
+        </span>
+        {% endfor %}
+      </div>
+      {% endif %}
+
+      <!-- Actions -->
+      {% if user.is_authenticated %}
+      <div
+        class="flex justify-between items-center pt-6 border-t border-gray-200"
+      >
+        <div class="flex gap-3">
+          <button
+            onclick="voteThread({{ thread.pk }}, 1)"
+            class="like-btn flex items-center gap-2 px-4 py-2 rounded-xl font-medium transition-all {% if user_vote == 1 %}bg-green-100 text-green-700 border border-green-300{% else %}bg-white text-gray-600 border border-gray-300 hover:bg-green-50{% endif %}"
+          >
+            <i class="fas fa-thumbs-up"></i>
+            <span class="likes-count">{{ likes_count }}</span>
+          </button>
+          <button
+            onclick="voteThread({{ thread.pk }}, -1)"
+            class="dislike-btn flex items-center gap-2 px-4 py-2 rounded-xl font-medium transition-all {% if user_vote == -1 %}bg-red-100 text-red-700 border border-red-300{% else %}bg-white text-gray-600 border border-gray-300 hover:bg-red-50{% endif %}"
+          >
+            <i class="fas fa-thumbs-down"></i>
+            <span class="dislikes-count">{{ dislikes_count }}</span>
+          </button>
+        </div>
+
+        <form
+          method="post"
+          action="{% url 'toggle_bookmark' thread.pk %}"
+          class="inline"
+        >
+          {% csrf_token %}
+          <button
+            type="submit"
+            class="bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 text-white px-6 py-2 rounded-xl font-medium transition-all shadow-md hover:shadow-lg flex items-center gap-2"
+          >
+            <i class="fas fa-bookmark"></i>
+            {% if is_bookmarked %}Hapus Bookmark{% else %}Bookmark{% endif %}
+          </button>
+        </form>
+      </div>
+      {% else %}
+      <div class="flex gap-3 pt-6 border-t border-gray-200">
+        <span
+          class="inline-flex items-center gap-2 bg-green-100 text-green-700 px-4 py-2 rounded-full text-sm font-medium"
+        >
+          <i class="fas fa-thumbs-up"></i> {{ likes_count }}
+        </span>
+        <span
+          class="inline-flex items-center gap-2 bg-red-100 text-red-700 px-4 py-2 rounded-full text-sm font-medium"
+        >
+          <i class="fas fa-thumbs-down"></i> {{ dislikes_count }}
+        </span>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Comments Section -->
+  <div
+    class="bg-white rounded-2xl shadow-md border border-gray-100 overflow-hidden"
+  >
+    <div class="bg-gray-50 px-6 py-4 border-b border-gray-200">
+      <h5 class="text-lg font-bold text-gray-800 flex items-center">
+        <i class="fas fa-comments mr-2 text-cyan-600"></i>
+        Komentar ({{ comments.count }})
+      </h5>
     </div>
 
-    <!-- Comments Section -->
-    <div class="card">
-        <div class="card-header">
-            <h5><i class="fas fa-comments"></i> Komentar ({{ thread.get_comment_count }})</h5>
+    <div class="p-6">
+      <!-- Comment Form -->
+      {% if user.is_authenticated and not thread.is_locked %}
+      <form
+        method="post"
+        action="{% url 'add_comment' thread.pk %}"
+        class="mb-6"
+      >
+        {% csrf_token %}
+        <div class="mb-4">
+          <textarea
+            name="content"
+            class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-4 focus:ring-cyan-100 focus:border-cyan-500 transition-all"
+            rows="3"
+            placeholder="Tulis komentar..."
+            required
+          ></textarea>
         </div>
-        <div class="card-body">
-            <!-- Display Comments -->
-            {% if comments %}
-                {% for comment in comments %}
-                    <div class="comment mb-3 p-3 border rounded">
-                        <div class="d-flex justify-content-between">
-                            <div>
-                                <strong>{{ comment.author.username }}</strong>
-                                <small class="text-muted">{{ comment.created_at|naturaltime }}</small>
-                                {% if comment.is_edited %}
-                                    <small class="text-muted">(diedit)</small>
-                                {% endif %}
-                            </div>
-                            <div>
-                                <!-- Vote buttons bisa ditambahkan di sini -->
-                                <span class="badge bg-info">{{ comment.get_vote_score }}</span>
-                            </div>
-                        </div>
-                        <div class="comment-content mt-2">
-                            {{ comment.content|linebreaks }}
-                        </div>
-                        
-                        <!-- Replies -->
-                        {% if comment.replies.all %}
-                            <div class="replies mt-3 ms-4">
-                                {% for reply in comment.replies.all %}
-                                    <div class="reply mb-2 p-2 border-start border-2 border-secondary">
-                                        <div>
-                                            <strong>{{ reply.author.username }}</strong>
-                                            <small class="text-muted">{{ reply.created_at|naturaltime }}</small>
-                                        </div>
-                                        <div class="mt-1">{{ reply.content|linebreaks }}</div>
-                                    </div>
-                                {% endfor %}
-                            </div>
-                        {% endif %}
-                        
-                        <!-- Reply Form (collapsed by default) -->
-                        {% if user.is_authenticated and not thread.is_locked %}
-                            <div class="reply-form mt-2">
-                                <button class="btn btn-sm btn-outline-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#replyForm{{ comment.id }}">
-                                    <i class="fas fa-reply"></i> Balas
-                                </button>
-                                <div class="collapse mt-2" id="replyForm{{ comment.id }}">
-                                    <form method="post" action="{% url 'add_comment' thread.pk %}">
-                                        {% csrf_token %}
-                                        <input type="hidden" name="parent_id" value="{{ comment.id }}">
-                                        <div class="mb-2">
-                                            <textarea name="content" class="form-control" rows="2" placeholder="Tulis balasan..."></textarea>
-                                        </div>
-                                        <button type="submit" class="btn btn-sm btn-primary">Kirim Balasan</button>
-                                    </form>
-                                </div>
-                            </div>
-                        {% endif %}
-                    </div>
-                {% endfor %}
+        <button
+          type="submit"
+          class="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white px-6 py-3 rounded-xl font-semibold transition-all shadow-md hover:shadow-lg flex items-center gap-2"
+        >
+          <i class="fas fa-paper-plane"></i>
+          Kirim Komentar
+        </button>
+      </form>
+      {% elif thread.is_locked %}
+      <div
+        class="bg-yellow-50 border border-yellow-200 text-yellow-800 px-4 py-3 rounded-xl mb-6 flex items-center"
+      >
+        <i class="fas fa-lock mr-2"></i>
+        Thread ini telah dikunci. Tidak bisa menambahkan komentar baru.
+      </div>
+      {% else %}
+      <div
+        class="bg-cyan-50 border border-cyan-200 text-cyan-800 px-4 py-3 rounded-xl mb-6"
+      >
+        <a
+          href="{% url 'login' %}"
+          class="font-medium hover:text-cyan-900 transition-colors"
+          >Login</a
+        >
+        untuk menambahkan komentar.
+      </div>
+      {% endif %}
+
+      <!-- Comments List -->
+      {% for comment in comments %}
+      <div class="bg-gray-50 rounded-xl border border-gray-200 p-4 mb-4">
+        <div class="flex justify-between items-start mb-3">
+          <div class="flex items-center gap-3">
+            {% if comment.author.avatar %}
+            <img
+              src="{{ comment.author.avatar.url }}"
+              class="w-10 h-10 rounded-full object-cover border-2 border-gray-200"
+              alt="Avatar"
+            />
             {% else %}
-                <div class="text-center text-muted py-4">
-                    <i class="fas fa-comments fa-3x mb-3"></i>
-                    <p>Belum ada komentar. Jadilah yang pertama berkomentar!</p>
-                </div>
+            <div
+              class="w-10 h-10 bg-gradient-to-br from-cyan-400 to-blue-500 rounded-full flex items-center justify-center"
+            >
+              <i class="fas fa-user text-white text-sm"></i>
+            </div>
             {% endif %}
+            <div>
+              <div class="font-semibold text-gray-800">
+                {% if comment.author %}
+                <a
+                  href="{% url 'profile_detail' comment.author.username %}"
+                  class="hover:text-cyan-600 transition-colors"
+                >
+                  {{ comment.author.username }}
+                </a>
+                {% if comment.author.is_verified %}
+                <i
+                  class="fas fa-check-circle text-green-500 ml-1"
+                  title="Verified"
+                ></i>
+                {% endif %}
+                {% else %}
+                <span class="text-gray-500">Pengguna Terhapus</span>
+                {% endif %}
+              </div>
+              <div class="text-sm text-gray-500">
+                {{ comment.created_at|naturaltime }}
+                {% if comment.is_edited %}
+                <span
+                  class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-700 ml-2"
+                  >edited</span
+                >
+                {% endif %}
+              </div>
+            </div>
+          </div>
+
+          {% if user.is_authenticated and comment.author == user or user.is_admin_user %}
+          <div class="relative">
+            <button
+              class="text-gray-400 hover:text-gray-600 p-2 rounded-lg hover:bg-gray-100 transition-all duration-300"
+              type="button"
+              onclick="toggleDropdown('commentDropdown{{ comment.pk }}')"
+            >
+              <i class="fas fa-ellipsis-v"></i>
+            </button>
+            <ul
+              id="commentDropdown{{ comment.pk }}"
+              class="absolute right-0 top-full mt-2 bg-white rounded-xl shadow-lg border border-gray-200 py-2 min-w-max z-10 hidden"
+            >
+              <li>
+                <button
+                  type="button"
+                  class="w-full text-left px-4 py-2 text-red-600 hover:bg-red-50 transition-colors duration-300 flex items-center gap-2"
+                  onclick="deleteComment({{ comment.pk }})"
+                >
+                  <i class="fas fa-trash text-sm"></i> Hapus Komentar
+                </button>
+              </li>
+            </ul>
+          </div>
+          {% endif %}
         </div>
+
+        <div class="text-gray-700 mb-4">{{ comment.content|linebreaks }}</div>
+
+        <div class="flex justify-between items-center">
+          <div class="flex gap-3">
+            {% if user.is_authenticated %}
+            <button
+              onclick="voteComment({{ comment.pk }})"
+              class="comment-like-btn flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all {% if comment.user_has_voted %}bg-pink-100 text-pink-700 border border-pink-300{% else %}bg-white text-gray-600 border border-gray-300 hover:bg-pink-50{% endif %}"
+            >
+              <i class="fas fa-heart"></i>
+              <span class="comment-likes-count"
+                >{{ comment.get_likes_count }}</span
+              >
+            </button>
+            {% if not thread.is_locked %}
+            <button
+              onclick="replyTo({{ comment.pk }}, '{{ comment.author.username }}')"
+              class="bg-white border border-gray-300 hover:bg-cyan-50 hover:border-cyan-400 text-gray-600 hover:text-cyan-700 px-3 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2"
+            >
+              <i class="fas fa-reply"></i> Balas
+            </button>
+            {% endif %}
+            {% else %}
+            <span
+              class="inline-flex items-center gap-2 bg-pink-100 text-pink-700 px-3 py-2 rounded-lg text-sm font-medium"
+            >
+              <i class="fas fa-heart"></i>{{ comment.get_likes_count }}
+            </span>
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- Replies -->
+        {% if comment.replies.all %}
+        <div class="mt-4 ml-6 space-y-3">
+          {% for reply in comment.replies.all %}
+          <div class="bg-white rounded-lg border-l-4 border-cyan-400 p-3">
+            <div class="flex justify-between items-start mb-2">
+              <div class="flex items-center gap-2">
+                {% if reply.author.avatar %}
+                <img
+                  src="{{ reply.author.avatar.url }}"
+                  class="w-8 h-8 rounded-full object-cover"
+                  alt="Avatar"
+                />
+                {% else %}
+                <div
+                  class="w-8 h-8 bg-gradient-to-br from-cyan-400 to-blue-500 rounded-full flex items-center justify-center"
+                >
+                  <i class="fas fa-user text-white text-xs"></i>
+                </div>
+                {% endif %}
+                <div>
+                  <div class="font-semibold text-gray-800 text-sm">
+                    {% if reply.author %}
+                    <a
+                      href="{% url 'profile_detail' reply.author.username %}"
+                      class="hover:text-cyan-600 transition-colors"
+                    >
+                      {{ reply.author.username }}
+                    </a>
+                    {% if reply.author.is_verified %}
+                    <i
+                      class="fas fa-check-circle text-green-500 ml-1"
+                      title="Verified"
+                    ></i>
+                    {% endif %}
+                    {% else %}
+                    <span class="text-gray-500">Pengguna Terhapus</span>
+                    {% endif %}
+                  </div>
+                  <div class="text-xs text-gray-500">
+                    {{ reply.created_at|naturaltime }}
+                  </div>
+                </div>
+              </div>
+
+              {% if user.is_authenticated and reply.author == user or user.is_admin_user %}
+              <div class="relative">
+                <button
+                  class="text-gray-400 hover:text-gray-600 p-1 rounded hover:bg-gray-100 transition-all duration-300"
+                  type="button"
+                  onclick="toggleDropdown('replyDropdown{{ reply.pk }}')"
+                >
+                  <i class="fas fa-ellipsis-v text-xs"></i>
+                </button>
+                <ul
+                  id="replyDropdown{{ reply.pk }}"
+                  class="absolute right-0 top-full mt-2 bg-white rounded-xl shadow-lg border border-gray-200 py-2 min-w-max z-10 hidden"
+                >
+                  <li>
+                    <button
+                      type="button"
+                      class="w-full text-left px-4 py-2 text-red-600 hover:bg-red-50 transition-colors duration-300 flex items-center gap-2"
+                      onclick="deleteComment({{ reply.pk }})"
+                    >
+                      <i class="fas fa-trash text-xs"></i> Hapus Balasan
+                    </button>
+                  </li>
+                </ul>
+              </div>
+              {% endif %}
+            </div>
+
+            <div class="text-gray-700 text-sm mb-2">
+              {{ reply.content|linebreaks }}
+            </div>
+
+            {% if user.is_authenticated %}
+            <button
+              onclick="voteComment({{ reply.pk }})"
+              class="comment-like-btn flex items-center gap-1 px-2 py-1 rounded text-xs font-medium transition-all {% if reply.user_has_voted %}bg-pink-100 text-pink-700{% else %}bg-gray-100 text-gray-600 hover:bg-pink-50{% endif %}"
+            >
+              <i class="fas fa-heart"></i>
+              <span class="comment-likes-count"
+                >{{ reply.get_likes_count }}</span
+              >
+            </button>
+            {% else %}
+            <span
+              class="inline-flex items-center gap-1 bg-pink-100 text-pink-700 px-2 py-1 rounded text-xs font-medium"
+            >
+              <i class="fas fa-heart"></i>{{ reply.get_likes_count }}
+            </span>
+            {% endif %}
+          </div>
+          {% endfor %}
+        </div>
+        {% endif %}
+      </div>
+      {% empty %}
+      <div class="text-center py-12">
+        <div class="bg-gray-50 rounded-2xl p-8 border border-gray-100">
+          <i class="fas fa-comments text-4xl mb-4 text-gray-400"></i>
+          <h6 class="text-lg font-semibold text-gray-800 mb-2">
+            Belum ada komentar
+          </h6>
+          <p class="text-gray-600">Jadilah yang pertama berkomentar!</p>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+<!-- Reply Modal -->
+<div
+  id="replyModal"
+  class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50"
+>
+  <div
+    class="bg-white rounded-2xl shadow-2xl max-w-lg mx-auto m-4 overflow-hidden"
+  >
+    <div class="p-6 border-b border-gray-100">
+      <h5 class="text-xl font-bold text-gray-800">Balas Komentar</h5>
+      <button
+        onclick="closeModal('replyModal')"
+        class="absolute top-4 right-4 text-gray-400 hover:text-gray-600"
+      >
+        <i class="fas fa-times text-lg"></i>
+      </button>
+    </div>
+    <form
+      method="post"
+      action="{% url 'add_comment' thread.pk %}"
+      id="replyForm"
+    >
+      {% csrf_token %}
+      <input type="hidden" name="parent_id" id="replyParentId" />
+      <div class="p-6">
+        <div class="mb-4">
+          <label class="block text-sm font-medium text-gray-700 mb-2">
+            Membalas:
+            <span id="replyToUser" class="text-cyan-600 font-semibold"></span>
+          </label>
+          <textarea
+            name="content"
+            class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-4 focus:ring-cyan-100 focus:border-cyan-500 transition-all"
+            rows="3"
+            placeholder="Tulis balasan..."
+            required
+          ></textarea>
+        </div>
+      </div>
+      <div class="p-6 border-t border-gray-100 flex justify-end gap-3">
+        <button
+          type="button"
+          onclick="closeModal('replyModal')"
+          class="bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 px-6 py-3 rounded-xl font-medium transition-all"
+        >
+          Batal
+        </button>
+        <button
+          type="submit"
+          class="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white px-6 py-3 rounded-xl font-medium transition-all shadow-lg flex items-center gap-2"
+        >
+          <i class="fas fa-paper-plane"></i> Kirim Balasan
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Edit Thread Modal -->
+<div
+  id="editModal"
+  class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50 p-4"
+>
+  <div
+    class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden"
+  >
+    <!-- Header -->
+    <div
+      class="flex justify-between items-center p-4 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-cyan-50"
+    >
+      <h5 class="text-lg font-bold text-gray-800 flex items-center">
+        <i class="fas fa-edit text-blue-600 mr-2"></i>
+        Edit Thread
+      </h5>
+      <button
+        onclick="closeModal('editModal')"
+        class="text-gray-400 hover:text-gray-600 p-1 rounded-lg hover:bg-gray-100 transition-all"
+      >
+        <i class="fas fa-times text-lg"></i>
+      </button>
     </div>
 
-    <!-- Add Comment Form -->
-    {% if user.is_authenticated %}
-        {% if not thread.is_locked %}
-            <div class="card mt-3">
-                <div class="card-header">
-                    <h6><i class="fas fa-plus"></i> Tambah Komentar</h6>
+    <!-- Form Content - Scrollable -->
+    <div class="overflow-y-auto max-h-[calc(90vh-140px)]">
+      <form
+        method="post"
+        action="{% url 'edit_thread' thread.pk %}"
+        id="editForm"
+        enctype="multipart/form-data"
+      >
+        {% csrf_token %}
+        <div class="p-4 space-y-4">
+          <!-- Title -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1"
+              >Judul Thread</label
+            >
+            <input
+              type="text"
+              name="title"
+              id="editTitle"
+              value="{{ thread.title }}"
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+              required
+            />
+          </div>
+
+          <!-- Content -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1"
+              >Konten</label
+            >
+            <textarea
+              name="content"
+              id="editContent"
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all resize-none"
+              rows="4"
+              required
+            >
+{{ thread.content }}</textarea
+            >
+            <div class="flex justify-between items-center mt-1">
+              <p class="text-xs text-gray-500">Minimal 10 karakter</p>
+              <span id="contentCounter" class="text-xs text-gray-400"></span>
+            </div>
+          </div>
+
+          <!-- Tags -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1"
+              >Tags</label
+            >
+            <input
+              type="text"
+              name="tags"
+              id="editTags"
+              value="{{ thread.tags }}"
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+              placeholder="teknologi, programming, django"
+            />
+            <p class="text-xs text-gray-500 mt-1">Pisahkan dengan koma</p>
+          </div>
+
+          <!-- Image Section -->
+          <div class="border-t border-gray-100 pt-4">
+            <label class="block text-sm font-medium text-gray-700 mb-2">
+              <i class="fas fa-image mr-1"></i>Gambar
+            </label>
+
+            {% if thread.image %}
+            <div class="mb-3">
+              <div class="relative inline-block">
+                <img
+                  src="{{ thread.image.url }}"
+                  alt="Current Image"
+                  class="h-20 w-auto object-cover rounded-lg border border-gray-200"
+                />
+                <div class="absolute -top-2 -right-2">
+                  <label
+                    class="bg-red-100 text-red-600 rounded-full p-1 cursor-pointer hover:bg-red-200 transition-colors"
+                  >
+                    <input
+                      type="checkbox"
+                      name="remove_image"
+                      class="sr-only"
+                    />
+                    <i class="fas fa-times text-xs"></i>
+                  </label>
                 </div>
-                <div class="card-body">
-                    <form method="post" action="{% url 'add_comment' thread.pk %}">
-                        {% csrf_token %}
-                        <div class="mb-3">
-                            {{ comment_form.content }}
-                        </div>
-                        <div class="d-flex justify-content-between align-items-center">
-                            <small class="text-muted">
-                                <i class="fas fa-star text-warning"></i> Anda akan mendapat 5 poin untuk setiap komentar
-                            </small>
-                            <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-paper-plane"></i> Kirim Komentar
-                            </button>
-                        </div>
-                    </form>
-                </div>
+              </div>
+              <p class="text-xs text-gray-500 mt-1">
+                Centang untuk menghapus gambar
+              </p>
             </div>
-        {% else %}
-            <div class="alert alert-warning mt-3">
-                <i class="fas fa-lock"></i> Thread ini sudah dikunci. Komentar tidak dapat ditambahkan.
-            </div>
-        {% endif %}
-    {% else %}
-        <div class="card mt-3">
-            <div class="card-body text-center">
-                <p class="mb-0">
-                    <a href="{% url 'login' %}?next={{ request.path }}" class="btn btn-primary">
-                        Masuk untuk berkomentar
-                    </a>
-                </p>
-            </div>
+            {% endif %}
+
+            <input
+              type="file"
+              name="image"
+              accept="image/*"
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all file:mr-3 file:py-1 file:px-3 file:rounded-md file:border-0 file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+            />
+            <p class="text-xs text-gray-500 mt-1">JPG, PNG, GIF (maks. 5MB)</p>
+          </div>
         </div>
-    {% endif %}
+      </form>
+    </div>
+
+    <!-- Footer -->
+    <div class="flex justify-end gap-3 p-4 border-t border-gray-200 bg-gray-50">
+      <button
+        type="button"
+        onclick="closeModal('editModal')"
+        class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 transition-all font-medium"
+      >
+        <i class="fas fa-times mr-1"></i>Batal
+      </button>
+      <button
+        type="submit"
+        form="editForm"
+        class="px-4 py-2 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-lg font-medium transition-all shadow-md hover:shadow-lg flex items-center"
+      >
+        <i class="fas fa-save mr-1"></i>Simpan
+      </button>
+    </div>
+  </div>
 </div>
+
+<!-- Delete Modal -->
+<div
+  id="deleteModal"
+  class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50"
+>
+  <div
+    class="bg-white rounded-2xl shadow-2xl max-w-md mx-auto m-4 overflow-hidden"
+  >
+    <div class="p-6 border-b border-gray-100">
+      <h5 class="text-xl font-bold text-gray-800 flex items-center">
+        <i class="fas fa-exclamation-triangle text-yellow-500 mr-3"></i>
+        Konfirmasi Penghapusan
+      </h5>
+    </div>
+    <div class="p-6">
+      <div class="text-center">
+        <i class="fas fa-trash-alt text-5xl text-red-500 mb-4"></i>
+        <h6 id="deleteMessage" class="text-lg font-semibold text-gray-800 mb-3">
+          Apakah Anda yakin ingin menghapus item ini?
+        </h6>
+        <p class="text-gray-600 text-sm">
+          Tindakan ini tidak dapat dibatalkan.
+        </p>
+      </div>
+    </div>
+    <div class="p-6 border-t border-gray-100 flex justify-center gap-3">
+      <button
+        onclick="closeModal('deleteModal')"
+        class="bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 px-6 py-3 rounded-xl font-medium transition-all"
+      >
+        <i class="fas fa-times mr-2"></i>Batal
+      </button>
+      <button
+        onclick="confirmDelete()"
+        class="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white px-6 py-3 rounded-xl font-medium transition-all shadow-lg flex items-center"
+      >
+        <i class="fas fa-trash mr-2"></i>Ya, Hapus
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Image Modal -->
+<div
+  id="imageModal"
+  class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50"
+>
+  <div
+    class="bg-white rounded-2xl shadow-2xl max-w-4xl mx-auto m-4 overflow-hidden"
+  >
+    <div class="p-4 border-b border-gray-100 flex justify-between items-center">
+      <h5 class="text-lg font-bold text-gray-800">Gambar Thread</h5>
+      <button
+        onclick="closeModal('imageModal')"
+        class="text-gray-400 hover:text-gray-600"
+      >
+        <i class="fas fa-times text-xl"></i>
+      </button>
+    </div>
+    <div class="p-4">
+      <div class="text-center">
+        <img
+          id="modalImage"
+          src=""
+          alt="Thread Image"
+          class="max-w-full max-h-96 object-contain rounded-xl shadow-lg"
+        />
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Hidden Forms -->
+<form
+  id="deleteThreadForm"
+  method="post"
+  action="{% url 'delete_thread' thread.pk %}"
+  style="display: none"
+>
+  {% csrf_token %}
+</form>
+
+<form id="deleteCommentForm" method="post" action="" style="display: none">
+  {% csrf_token %}
+</form>
+
+<script>
+  // Modal functions
+  function openModal(modalId) {
+    document.getElementById(modalId).classList.remove('hidden');
+    document.getElementById(modalId).classList.add('flex');
+  }
+
+  function closeModal(modalId) {
+    document.getElementById(modalId).classList.add('hidden');
+    document.getElementById(modalId).classList.remove('flex');
+  }
+
+  // Dropdown functions
+  function toggleDropdown(dropdownId) {
+    const dropdown = document.getElementById(dropdownId);
+    const isHidden = dropdown.classList.contains('hidden');
+
+    // Close all dropdowns first
+    document.querySelectorAll('ul[id$="Dropdown"]').forEach(dd => {
+      dd.classList.add('hidden');
+    });
+
+    // Toggle the target dropdown
+    if (isHidden) {
+      dropdown.classList.remove('hidden');
+      // Small delay for animation
+      setTimeout(() => {
+        dropdown.style.opacity = '1';
+        dropdown.style.transform = 'translateY(0)';
+      }, 10);
+    }
+  }
+
+  // Close dropdowns when clicking outside
+  function closeDropdowns() {
+    document.querySelectorAll('ul[id$="Dropdown"]').forEach(dd => {
+      dd.style.opacity = '0';
+      dd.style.transform = 'translateY(-10px)';
+      setTimeout(() => {
+        dd.classList.add('hidden');
+      }, 200);
+    });
+  }
+
+  // Global variables
+  let deleteTarget = null;
+  let deleteType = null;
+
+  // Thread functions
+  function editThread() {
+    // Close dropdown first
+    closeDropdowns();
+    // Open edit modal
+    openModal('editModal');
+    // Auto-resize textarea
+    const textarea = document.getElementById('editContent');
+    if (textarea) {
+      textarea.style.height = 'auto';
+      textarea.style.height = textarea.scrollHeight + 'px';
+    }
+  }
+
+  function deleteThread() {
+    // Close dropdown first
+    closeDropdowns();
+    deleteTarget = {{ thread.pk }};
+    deleteType = 'thread';
+    document.getElementById('deleteMessage').textContent = 'Apakah Anda yakin ingin menghapus thread ini?';
+    openModal('deleteModal');
+  }
+
+  function voteThread(threadId, value) {
+    fetch(`/thread/${threadId}/vote/`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+      },
+      body: `value=${value}`,
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.error) {
+        alert(data.error);
+      } else {
+        // Update counts
+        document.querySelector('.likes-count').textContent = data.likes;
+        document.querySelector('.dislikes-count').textContent = data.dislikes;
+
+        // Update button states
+        const likeBtn = document.querySelector('.like-btn');
+        const dislikeBtn = document.querySelector('.dislike-btn');
+
+        // Reset states
+        likeBtn.className = likeBtn.className.replace(/bg-green-\d+|text-green-\d+|border-green-\d+/g, '');
+        dislikeBtn.className = dislikeBtn.className.replace(/bg-red-\d+|text-red-\d+|border-red-\d+/g, '');
+
+        if (data.user_vote === 1) {
+          likeBtn.className += ' bg-green-100 text-green-700 border-green-300';
+        } else if (data.user_vote === -1) {
+          dislikeBtn.className += ' bg-red-100 text-red-700 border-red-300';
+        }
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      alert('Terjadi kesalahan saat voting');
+    });
+  }
+
+  // Comment functions
+  function replyTo(commentId, username) {
+    document.getElementById('replyParentId').value = commentId;
+    document.getElementById('replyToUser').textContent = username;
+    openModal('replyModal');
+  }
+
+  function deleteComment(commentId) {
+    deleteTarget = commentId;
+    deleteType = 'comment';
+    document.getElementById('deleteMessage').textContent = 'Apakah Anda yakin ingin menghapus komentar ini?';
+    document.getElementById('deleteCommentForm').action = `/comment/${commentId}/delete/`;
+    openModal('deleteModal');
+  }
+
+  function voteComment(commentId) {
+    fetch(`/comment/${commentId}/vote/`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+      },
+      body: 'value=1',
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.error) {
+        alert(data.error);
+      } else {
+        // Find the button and update count
+        const buttons = document.querySelectorAll(`[onclick="voteComment(${commentId})"]`);
+        buttons.forEach(button => {
+          const countSpan = button.querySelector('.comment-likes-count');
+          if (countSpan) {
+            countSpan.textContent = data.likes;
+
+            // Update button state
+            if (data.vote_removed) {
+              button.className = button.className.replace(/bg-pink-\d+|text-pink-\d+|border-pink-\d+/g, '');
+              button.className += ' bg-white text-gray-600 border-gray-300 hover:bg-pink-50';
+            } else {
+              button.className = button.className.replace(/bg-white|text-gray-\d+|border-gray-\d+|hover:bg-pink-\d+/g, '');
+              button.className += ' bg-pink-100 text-pink-700 border-pink-300';
+            }
+          }
+        });
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      alert('Terjadi kesalahan saat voting');
+    });
+  }
+
+  function confirmDelete() {
+    if (deleteType === 'thread') {
+      document.getElementById('deleteThreadForm').submit();
+    } else if (deleteType === 'comment') {
+      document.getElementById('deleteCommentForm').submit();
+    }
+  }
+
+  // Image modal
+  function openImageModal(imageSrc) {
+    document.getElementById('modalImage').src = imageSrc;
+    openModal('imageModal');
+  }
+
+  // Close modals when clicking outside
+  document.addEventListener('click', function(e) {
+    if (e.target.classList.contains('fixed') && e.target.classList.contains('inset-0')) {
+      const modalId = e.target.id;
+      if (modalId) {
+        closeModal(modalId);
+      }
+    }
+
+    // Close dropdowns when clicking outside
+    if (!e.target.closest('[onclick*="toggleDropdown"]') && !e.target.closest('ul[id$="Dropdown"]')) {
+      closeDropdowns();
+    }
+  });
+
+  // Auto-resize textareas
+  document.addEventListener('DOMContentLoaded', function() {
+    const textareas = document.querySelectorAll('textarea');
+    textareas.forEach(textarea => {
+      textarea.addEventListener('input', function() {
+        this.style.height = 'auto';
+        this.style.height = (this.scrollHeight) + 'px';
+      });
+    });
+
+    // Character counter for edit modal
+    const editContent = document.getElementById('editContent');
+    const contentCounter = document.getElementById('contentCounter');
+
+    if (editContent && contentCounter) {
+      function updateCounter() {
+        const count = editContent.value.length;
+        contentCounter.textContent = `${count} karakter`;
+
+        if (count < 10) {
+          contentCounter.className = 'text-xs text-red-500';
+        } else if (count > 1000) {
+          contentCounter.className = 'text-xs text-yellow-500';
+        } else {
+          contentCounter.className = 'text-xs text-green-500';
+        }
+      }
+
+      // Initial count
+      updateCounter();
+
+      // Update on input
+      editContent.addEventListener('input', updateCounter);
+    }
+
+    // Image removal checkbox handler
+    const removeImageCheckbox = document.querySelector('input[name="remove_image"]');
+    if (removeImageCheckbox) {
+      const imageContainer = removeImageCheckbox.closest('.relative');
+      const image = imageContainer?.querySelector('img');
+
+      removeImageCheckbox.addEventListener('change', function() {
+        if (image) {
+          if (this.checked) {
+            image.style.opacity = '0.3';
+            image.style.filter = 'grayscale(100%)';
+          } else {
+            image.style.opacity = '1';
+            image.style.filter = 'none';
+          }
+        }
+      });
+    }
+  });
+</script>
 {% endblock %}
