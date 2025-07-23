@@ -30,7 +30,7 @@ Fitur utama meliputi pendaftaran akun, login, pembuatan thread, komentar, voting
 
 1. Clone repository:
    ```
-   git clone https://github.com/username/portal_komunitas_forum_mahasiswa.git
+   git clone https://github.com/Arizalfiqri/AgoraTalk.git
    cd portal_komunitas_forum_mahasiswa
    ```
 2. Install dependencies:
@@ -40,6 +40,11 @@ Fitur utama meliputi pendaftaran akun, login, pembuatan thread, komentar, voting
 3. Migrasi database:
    ```
    python manage.py migrate
+   ```
+4. Install dan Jalankan Environment:
+   ```
+   python -m venv venv
+   source venv/Scripts/activate
    ```
 4. Jalankan server:
    ```
