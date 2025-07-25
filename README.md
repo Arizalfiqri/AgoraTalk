@@ -18,9 +18,9 @@ Fitur utama meliputi pendaftaran akun, login, pembuatan thread, komentar, voting
 ## 🛠️ Teknologi
 
 - **Python** & **Django**
-- **SQLite3** (multi-database: `db.sqlite3` untuk user & `admin_db.sqlite3` untuk admin)
+- **SQLite3** (database: `db.sqlite3`)
 - **HTML + CSS + JavaScript**
-- **Bootstrap** untuk styling frontend
+- **Bootstrap dan Tailwind CSS** untuk styling frontend
 - **Jazzmin** untuk tampilan admin yang lebih modern
 - Otentikasi kustom via `AdminAuthenticationBackend` dan `UserAuthenticationBackend`
 
